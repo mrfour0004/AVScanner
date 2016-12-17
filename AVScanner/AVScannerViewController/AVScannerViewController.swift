@@ -35,6 +35,8 @@ class AVScannerViewController: UIViewController {
     
     let captureMetaDataOutput = AVCaptureMetadataOutput()
     
+    // MARK: - View controller life cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         prepareView()
@@ -62,24 +64,11 @@ class AVScannerViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        sessionQueue.async {
-            switch self.setupResult {
-            case .success:
-                self.session.startRunning()
-                self.isSessionRunning = self.session.isRunning
-            default: break
-            }
-        }
+        startRunningSession()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        sessionQueue.async { [unowned self] in
-            if self.setupResult == .success {
-                self.session.stopRunning()
-                self.isSessionRunning = self.session.isRunning
-            }
-        }
-        
+        stopRunintSession()
         super.viewWillDisappear(animated)
     }
     
@@ -154,6 +143,46 @@ class AVScannerViewController: UIViewController {
         captureMetaDataOutput.metadataObjectTypes = [AVMetadataObjectTypeQRCode]
         
         session.commitConfiguration()
+    }
+    
+    // MARK: - Session control 
+    
+    private func startRunningSession() {
+        sessionQueue.async {
+            switch self.setupResult {
+            case .success:
+                self.session.startRunning()
+                self.isSessionRunning = self.session.isRunning
+            case .notAuthorized:
+                DispatchQueue.main.async { [unowned self] in
+                    let message = NSLocalizedString("AVCam doesn't have permission to use the camera, please change privacy settings", comment: "Alert message when the user has denied access to the camera")
+                    let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: "Alert button to open Settings"), style: .`default`, handler: { action in
+                        UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+                    }))
+                    
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            case .configurationFailed:
+                DispatchQueue.main.async { [unowned self] in
+                    let message = NSLocalizedString("Unable to capture media", comment: "Alert message when something goes wrong during capture session configuration")
+                    let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
+                    
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            }
+        }
+    }
+    
+    private func stopRunintSession() {
+        sessionQueue.async { [unowned self] in
+            if self.setupResult == .success {
+                self.session.stopRunning()
+                self.isSessionRunning = self.session.isRunning
+            }
+        }
     }
 }
 

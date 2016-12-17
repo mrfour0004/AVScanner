@@ -72,6 +72,18 @@ class AVScannerViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        guard let videoPreviewLayerConnection = previewView.videoPreviewLayer.connection else { return }
+        
+        let deviceOrientation = UIDevice.current.orientation
+        
+        guard let newVideoOrientation = deviceOrientation.videoOrientation, deviceOrientation.isPortrait || deviceOrientation.isLandscape else { return }
+        
+        videoPreviewLayerConnection.videoOrientation = newVideoOrientation
+    }
+    
     // MARK: - Prepare view
     
     private func prepareView() {
@@ -184,6 +196,9 @@ class AVScannerViewController: UIViewController {
             }
         }
     }
+    
+    // MARK: - KVO and Notification
+    
 }
 
 // MARK: - AV Capture

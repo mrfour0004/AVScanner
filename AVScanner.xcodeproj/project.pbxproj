@@ -14,6 +14,7 @@
 		5E49B37B1E042ECC008ABA6B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5E49B3791E042ECC008ABA6B /* LaunchScreen.storyboard */; };
 		5E49B3841E042FE4008ABA6B /* AVScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E49B3831E042FE4008ABA6B /* AVScannerViewController.swift */; };
 		5E49B3861E04337B008ABA6B /* AVScannerPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E49B3851E04337B008ABA6B /* AVScannerPreviewView.swift */; };
+		5EA6CB121E0538030008BE7D /* AVScannerFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA6CB111E0538030008BE7D /* AVScannerFocusView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		5E49B37C1E042ECC008ABA6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5E49B3831E042FE4008ABA6B /* AVScannerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AVScannerViewController.swift; path = AVScannerViewController/AVScannerViewController.swift; sourceTree = "<group>"; };
 		5E49B3851E04337B008ABA6B /* AVScannerPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AVScannerPreviewView.swift; path = AVScannerViewController/AVScannerPreviewView.swift; sourceTree = "<group>"; };
+		5EA6CB111E0538030008BE7D /* AVScannerFocusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AVScannerFocusView.swift; path = AVScannerViewController/AVScannerFocusView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 			children = (
 				5E49B3831E042FE4008ABA6B /* AVScannerViewController.swift */,
 				5E49B3851E04337B008ABA6B /* AVScannerPreviewView.swift */,
+				5EA6CB111E0538030008BE7D /* AVScannerFocusView.swift */,
 			);
 			name = AVScannerViewController;
 			sourceTree = "<group>";
@@ -152,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E49B3731E042ECC008ABA6B /* ViewController.swift in Sources */,
+				5EA6CB121E0538030008BE7D /* AVScannerFocusView.swift in Sources */,
 				5E49B3711E042ECC008ABA6B /* AppDelegate.swift in Sources */,
 				5E49B3841E042FE4008ABA6B /* AVScannerViewController.swift in Sources */,
 				5E49B3861E04337B008ABA6B /* AVScannerPreviewView.swift in Sources */,
@@ -318,6 +322,7 @@
 				5E49B3811E042ECC008ABA6B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

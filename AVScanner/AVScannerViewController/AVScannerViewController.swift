@@ -10,30 +10,38 @@ import UIKit
 import AVFoundation
 
 class AVScannerViewController: UIViewController {
+    
+//    open var barcodeHandler: ((_ barcodeObject: AVMetadataMachineReadableCodeObject, _ barcodeCorners: [Any]) -> Void)?
+    open var barcodeHandler: ((_ barcodeString: String) -> Void)?
+    
     // MARK: - Device configuration
     
     private let videoDeviceDiscoverySession = AVCaptureDeviceDiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDuoCamera], mediaType: AVMediaTypeVideo, position: .unspecified)
     
     // MARK: - Session management
     
-    private enum SessionSetupResult {
+    fileprivate enum SessionSetupResult {
         case success
         case notAuthorized
         case configurationFailed
     }
     
-    private var previewView: AVScannerPreviewView!
-    private var setupResult: SessionSetupResult = .success
-    private var isSessionRunning = false
+    fileprivate let previewView = AVScannerPreviewView()
+    fileprivate var setupResult: SessionSetupResult = .success
+    open var isSessionRunning = false
     
-    private let session = AVCaptureSession()
-    private let sessionQueue = DispatchQueue(label: "session queue")
+    fileprivate let session = AVCaptureSession()
+    fileprivate let sessionQueue = DispatchQueue(label: "session queue")
     
     var videoDeviceInput: AVCaptureDeviceInput!
     
     // MARK: - Meta data output
     
     let captureMetaDataOutput = AVCaptureMetadataOutput()
+    
+    // MARK: - Focus view
+    
+    let focusView = AVScannerFocusView(frame: CGRect(x: 0, y: 0, width: 200, height: 200))
     
     // MARK: - View controller life cycle
     
@@ -68,30 +76,38 @@ class AVScannerViewController: UIViewController {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        stopRunintSession()
+        stopRunningSession()
         super.viewWillDisappear(animated)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        guard let videoPreviewLayerConnection = previewView.videoPreviewLayer.connection else { return }
+        if isSessionRunning {
+            focusView.startAnimation()
+        }
         
         let deviceOrientation = UIDevice.current.orientation
         
-        guard let newVideoOrientation = deviceOrientation.videoOrientation, deviceOrientation.isPortrait || deviceOrientation.isLandscape else { return }
+        guard let videoPreviewLayerConnection = previewView.videoPreviewLayer.connection ,
+              let newVideoOrientation = deviceOrientation.videoOrientation, deviceOrientation.isPortrait || deviceOrientation.isLandscape else { return }
         
         videoPreviewLayerConnection.videoOrientation = newVideoOrientation
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        focusView.layer.anchorPoint = CGPoint.zero
     }
     
     // MARK: - Prepare view
     
     private func prepareView() {
         preparePreviewView()
+        prepareFocusView()
     }
     
     private func preparePreviewView() {
-        previewView = AVScannerPreviewView()
         view.addSubview(previewView)
         
         previewView.translatesAutoresizingMaskIntoConstraints = false
@@ -100,6 +116,12 @@ class AVScannerViewController: UIViewController {
         let heightConstraint  = NSLayoutConstraint(item: view, attribute: .height, relatedBy: .equal, toItem: previewView, attribute: .height, multiplier: 1, constant: 0)
         let widthConstraint   = NSLayoutConstraint(item: view, attribute: .width, relatedBy: .equal, toItem: previewView, attribute: .width, multiplier: 1, constant: 0)
         NSLayoutConstraint.activate([centerXConstraint, centerYConstraint, heightConstraint, widthConstraint])
+    }
+    
+    private func prepareFocusView() {
+//        focusView.alpha = 0
+        view.addSubview(focusView)
+        view.bringSubview(toFront: focusView)
     }
     
     // MARK: - Configure 
@@ -159,12 +181,15 @@ class AVScannerViewController: UIViewController {
     
     // MARK: - Session control 
     
-    private func startRunningSession() {
+    open func startRunningSession() {
         sessionQueue.async {
             switch self.setupResult {
             case .success:
                 self.session.startRunning()
                 self.isSessionRunning = self.session.isRunning
+                DispatchQueue.main.async { [unowned self] in
+                    self.focusView.startAnimation()
+                }
             case .notAuthorized:
                 DispatchQueue.main.async { [unowned self] in
                     let message = NSLocalizedString("AVCam doesn't have permission to use the camera, please change privacy settings", comment: "Alert message when the user has denied access to the camera")
@@ -188,7 +213,7 @@ class AVScannerViewController: UIViewController {
         }
     }
     
-    private func stopRunintSession() {
+    private func stopRunningSession() {
         sessionQueue.async { [unowned self] in
             if self.setupResult == .success {
                 self.session.stopRunning()
@@ -205,10 +230,39 @@ class AVScannerViewController: UIViewController {
 
 extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
-        guard let metadataObj = metadataObjects.first as? AVMetadataMachineReadableCodeObject, let barcodeString = metadataObj.stringValue else { return }
-        print("captured a barcode: \(barcodeString)")
+        guard let barcodeObject = metadataObjects.first as? AVMetadataObject, let transformedMetadataObject = previewView.videoPreviewLayer.transformedMetadataObject(for: barcodeObject) as? AVMetadataMachineReadableCodeObject else { return }
+        print("captured output")
+        sessionQueue.async { [unowned self] in
+            self.session.stopRunning()
+            self.isSessionRunning = self.session.isRunning
+            
+            DispatchQueue.main.async { [unowned self] in
+                self.focusView.transform(to: transformedMetadataObject.corners) { [unowned self] in
+                    self.barcodeHandler?(transformedMetadataObject.stringValue)
+                }
+            }
+        }
     }
 }
+
+/*
+extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
+    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
+        var barcodeObjects = [AVMetadataMachineReadableCodeObject]()
+        var corners = [Any]()
+        
+        for metadataObject in metadataObjects as! [AVMetadataObject] {
+            guard let transformedMetadataObject = previewView.videoPreviewLayer.transformedMetadataObject(for: metadataObject), transformedMetadataObject is AVMetadataMachineReadableCodeObject else { continue }
+            let barcodeObject = transformedMetadataObject as! AVMetadataMachineReadableCodeObject
+            barcodeObjects.append(barcodeObject)
+            corners.append(barcodeObject.corners)
+        }
+        
+        guard barcodeObjects.count > 0 else { return }
+        barcodeHandler?(barcodeObjects, corners)
+    }
+}
+*/
 
 // MARK: - Device orientation
 

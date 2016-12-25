@@ -80,6 +80,11 @@ class AVScannerViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        focusView.layer.anchorPoint = CGPoint.zero
+    }
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
@@ -95,11 +100,11 @@ class AVScannerViewController: UIViewController {
         videoPreviewLayerConnection.videoOrientation = newVideoOrientation
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        focusView.layer.anchorPoint = CGPoint.zero
+    override var shouldAutorotate: Bool {
+        get {
+            return isSessionRunning
+        }
     }
-    
     // MARK: - Prepare view
     
     private func prepareView() {

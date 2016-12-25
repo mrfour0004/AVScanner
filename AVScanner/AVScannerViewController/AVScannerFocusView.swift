@@ -38,10 +38,7 @@ class AVScannerFocusView: UIView {
     private func prepareView() {
         layer.borderColor = borderColor.cgColor
         layer.borderWidth = 1.5
-    }
-    
-    func alignCenter(to rect: CGRect) {
-        center = CGPoint(x: rect.midX - self.breathAnimationOriginSize.width / 2 , y: rect.midY - self.breathAnimationOriginSize.height / 2)
+        layer.allowsEdgeAntialiasing = true
     }
     
     // MARK: - Animation

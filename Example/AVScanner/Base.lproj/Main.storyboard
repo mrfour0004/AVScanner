@@ -20,8 +20,27 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1WA-7Q-e3A">
+                                <rect key="frame" x="157" y="626" width="60" height="33"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Camera">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="cameraChange:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="kjt-cb-GdN"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="1WA-7Q-e3A" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="Z1X-s1-c3M"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="1WA-7Q-e3A" secondAttribute="bottom" constant="8" id="zC0-vr-DDY"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="cameraButton" destination="1WA-7Q-e3A" id="Xxu-wH-MoJ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>

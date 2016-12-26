@@ -187,7 +187,7 @@ open class AVScannerViewController: UIViewController {
     
     // MARK: - Session control
     
-    open func startRunningSession() {
+    public func startRunningSession() {
         sessionQueue.async {
             switch self.setupResult {
             case .success:
@@ -226,6 +226,41 @@ open class AVScannerViewController: UIViewController {
                 self.isSessionRunning = self.session.isRunning
             }
         }
+    }
+    
+    public func flip() {
+        guard session != nil && session.inputs.count > 0 else { return }
+        
+        sessionQueue.async { [unowned self] in
+            self.flipCamera()
+        }
+    }
+    
+    fileprivate func flipCamera() {
+        
+        DispatchQueue.main.async { [unowned self] in
+            UIView.transition(with: self.previewView, duration: 0.5, options: [.transitionFlipFromLeft], animations: nil, completion: nil)
+        }
+        
+        session.beginConfiguration()
+        
+        guard let currentCaptureInput = session.inputs.first as? AVCaptureDeviceInput else {
+            session.commitConfiguration()
+            return
+        }
+        
+        session.removeInput(currentCaptureInput)
+        let newPosition: AVCaptureDevicePosition = currentCaptureInput.device.position == .front ? .back : .front
+        
+        do {
+            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.cameraWithPosition(position: newPosition))
+            session.addInput(newCaptureDeviceInput)
+        } catch let error as NSError {
+            session.commitConfiguration()
+        }
+        
+        session.commitConfiguration()
+        
     }
     
     // MARK: - KVO and Notification
@@ -299,6 +334,17 @@ extension UIInterfaceOrientation {
     }
 }
 
+extension AVCaptureDevice {
+    class func cameraWithPosition(position: AVCaptureDevicePosition) -> AVCaptureDevice? {
+        guard let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as? [AVCaptureDevice] else { return nil }
+        for device in devices {
+            if device.position == position {
+                return device
+            }
+        }
+        return nil
+    }
+}
 
 
 

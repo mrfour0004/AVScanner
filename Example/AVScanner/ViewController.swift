@@ -11,11 +11,21 @@ import AVScanner
 
 @available(iOS 10.0, *)
 class ViewController: AVScannerViewController {
+    
+    @IBOutlet weak var cameraButton: UIButton!
+    @IBAction func cameraChange(_ sender: Any) {
+        flip()
+    }
+    
+    // MARK: - View controller life cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         prepareBarcodeHandler()
         prepareViewTapHandler()
+        
+        view.bringSubview(toFront: cameraButton)
     }
     
     override func didReceiveMemoryWarning() {

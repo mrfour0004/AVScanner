@@ -3,12 +3,11 @@
 //  AVScanner
 //
 //  Created by mrfour on 17/12/2016.
-//  Copyright © 2016 mrfour. All rights reserved.
 //
 
 import UIKit
 
-class AVScannerFocusView: UIView {
+public class AVScannerFocusView: UIView {
     
     // MARK: - Animation configuration
     
@@ -29,11 +28,11 @@ class AVScannerFocusView: UIView {
         prepareView()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
-    // MARK: - Prepare view 
+    // MARK: - Prepare view
     
     private func prepareView() {
         layer.borderColor = borderColor.cgColor
@@ -66,7 +65,7 @@ class AVScannerFocusView: UIView {
             
             UIView.animate(withDuration: 1.25, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut], animations: { [unowned self, targetOrigin] in
                 self.frame = CGRect(origin: targetOrigin, size: self.breathAnimationTargetSize)
-            }, completion: nil)
+                }, completion: nil)
         }
     }
     
@@ -95,12 +94,12 @@ class AVScannerFocusView: UIView {
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut, .beginFromCurrentState], animations: { [unowned self] in
             self.frame = b
             self.layer.transform = self.rectToQuad(rect: self.bounds,
-                                              topLeft:     CGPoint(x: tl.x-b.origin.x, y: tl.y-b.origin.y),
-                                              topRight:    CGPoint(x: tr.x-b.origin.x, y: tr.y-b.origin.y),
-                                              bottomLeft:  CGPoint(x: bl.x-b.origin.x, y: bl.y-b.origin.y),
-                                              bottomRight: CGPoint(x: br.x-b.origin.x, y: br.y-b.origin.y))
-        }, completion: { _ in
-            completion?()
+                                                   topLeft:     CGPoint(x: tl.x-b.origin.x, y: tl.y-b.origin.y),
+                                                   topRight:    CGPoint(x: tr.x-b.origin.x, y: tr.y-b.origin.y),
+                                                   bottomLeft:  CGPoint(x: bl.x-b.origin.x, y: bl.y-b.origin.y),
+                                                   bottomRight: CGPoint(x: br.x-b.origin.x, y: br.y-b.origin.y))
+            }, completion: { _ in
+                completion?()
         })
         
     }

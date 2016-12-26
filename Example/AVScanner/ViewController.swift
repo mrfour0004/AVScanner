@@ -2,21 +2,22 @@
 //  ViewController.swift
 //  AVScanner
 //
-//  Created by mrfour on 16/12/2016.
-//  Copyright © 2016 mrfour. All rights reserved.
+//  Created by mrfour on 12/26/2016.
+//  Copyright (c) 2016 mrfour. All rights reserved.
 //
 
 import UIKit
+import AVScanner
 
+@available(iOS 10.0, *)
 class ViewController: AVScannerViewController {
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
         prepareBarcodeHandler()
         prepareViewTapHandler()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -41,6 +42,5 @@ class ViewController: AVScannerViewController {
     func viewTapHandler(_ gesture: UITapGestureRecognizer) {
         guard !isSessionRunning else { return }
         startRunningSession()
-    }
-}
+    }}
 

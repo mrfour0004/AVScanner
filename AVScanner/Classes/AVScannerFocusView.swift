@@ -70,7 +70,11 @@ public class AVScannerFocusView: UIView {
     }
     
     func stopAnimation() {
-        
+        UIView.animate(withDuration: 0.1, animations: { [unowned self] in
+            self.alpha = 0
+        }) { [unowned self] _ in
+            self.layer.removeAllAnimations()
+        }
     }
     
     func transform(to corners: [Any], completion: (() -> Void)? = nil) {

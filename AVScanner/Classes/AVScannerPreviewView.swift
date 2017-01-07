@@ -29,4 +29,17 @@ public class AVScannerPreviewView: UIView {
     public override class var layerClass: AnyClass {
         return AVCaptureVideoPreviewLayer.self
     }
+    
+    internal var screenshotImage: UIImage {
+        let targetLayer = layer
+        
+        UIGraphicsBeginImageContextWithOptions(targetLayer.frame.size, true, UIScreen.main.scale)
+        
+        targetLayer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return image!
+    }
 }

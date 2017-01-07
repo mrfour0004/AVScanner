@@ -231,6 +231,7 @@ open class AVScannerViewController: UIViewController {
     public func flip() {
         guard session != nil && session.inputs.count > 0 else { return }
         
+        
         sessionQueue.async { [unowned self] in
             self.flipCamera()
         }
@@ -238,8 +239,24 @@ open class AVScannerViewController: UIViewController {
     
     fileprivate func flipCamera() {
         
+        
         DispatchQueue.main.async { [unowned self] in
-            UIView.transition(with: self.previewView, duration: 0.5, options: [.transitionFlipFromLeft], animations: nil, completion: nil)
+            self.focusView.stopAnimation()
+            
+            let blurView = UIVisualEffectView()
+            blurView.frame = self.previewView.frame
+            blurView.tag = 100
+            blurView.effect = UIBlurEffect(style: .light)
+            self.previewView.addSubview(blurView)
+//            let screenshotImage = self.previewView.screenshotImage
+            
+            UIView.transition(with: self.previewView, duration: 0.4, options: [.transitionFlipFromLeft, .curveEaseInOut], animations: nil, completion: { _ in
+                UIView.transition(with: self.previewView, duration: 0.2, options: [.transitionCrossDissolve], animations: {
+                    blurView.removeFromSuperview()
+                }, completion: { _ in
+                    self.focusView.startAnimation()
+                })
+            })
         }
         
         session.beginConfiguration()
@@ -261,6 +278,16 @@ open class AVScannerViewController: UIViewController {
         
         session.commitConfiguration()
         
+//        DispatchQueue.main.async { [unowned self] in
+//            if let blurView = self.previewView.viewWithTag(100) {
+//                UIView.transition(with: self.previewView, duration: 0.1, options: [.transitionCrossDissolve, .curveEaseInOut], animations: { [unowned blurView] in
+//                    blurView.removeFromSuperview()
+//                }, completion: nil)
+////                UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+////                    blurView.removeFromSuperview()
+////                }, completion: nil)
+//            }
+//        }
     }
     
     // MARK: - KVO and Notification

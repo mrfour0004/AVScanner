@@ -8,15 +8,12 @@
 import UIKit
 import AVFoundation
 
-@available(iOS 10.0, *)
 open class AVScannerViewController: UIViewController {
     
-    //    open var barcodeHandler: ((_ barcodeObject: AVMetadataMachineReadableCodeObject, _ barcodeCorners: [Any]) -> Void)?
+    //ㄋopen var barcodeHandler: ((_ barcodeObject: AVMetadataMachineReadableCodeObject, _ barcodeCorners: [Any]) -> Void)?
     open var barcodeHandler: ((_ barcodeString: String) -> Void)?
     
     // MARK: - Device configuration
-    
-    private let videoDeviceDiscoverySession = AVCaptureDeviceDiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDuoCamera], mediaType: AVMediaTypeVideo, position: .unspecified)
     
     // MARK: - Session management
     
@@ -138,16 +135,7 @@ open class AVScannerViewController: UIViewController {
         session.beginConfiguration()
         
         do {
-            var defaultVideoDevice: AVCaptureDevice?
-            
-            if let dualCameraDevice = AVCaptureDevice.defaultDevice(withDeviceType: .builtInDuoCamera, mediaType: AVMediaTypeVideo, position: .back) {
-                defaultVideoDevice = dualCameraDevice
-            } else if let backCameraDevice = AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .back) {
-                defaultVideoDevice = backCameraDevice
-            } else if let frontCameraDevice = AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .front) {
-                defaultVideoDevice = frontCameraDevice
-            }
-            
+            let defaultVideoDevice = AVCaptureDevice.device(withPosition: .back) ?? AVCaptureDevice.device(withPosition: .front)
             let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice)
             
             if session.canAddInput(videoDeviceInput) {
@@ -202,7 +190,11 @@ open class AVScannerViewController: UIViewController {
                     let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: "Alert button to open Settings"), style: .`default`, handler: { action in
-                        UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+                        if #available(iOS 10.0, *) {
+                            UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+                        } else {
+                            UIApplication.shared.openURL(URL(string: UIApplicationOpenSettingsURLString)!)
+                        }
                     }))
                     
                     self.present(alertController, animated: true, completion: nil)
@@ -230,7 +222,6 @@ open class AVScannerViewController: UIViewController {
     
     public func flip() {
         guard session != nil && session.inputs.count > 0 else { return }
-        
         
         sessionQueue.async { [unowned self] in
             self.flipCamera()
@@ -270,7 +261,7 @@ open class AVScannerViewController: UIViewController {
         let newPosition: AVCaptureDevicePosition = currentCaptureInput.device.position == .front ? .back : .front
         
         do {
-            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.cameraWithPosition(position: newPosition))
+            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.device(withPosition: newPosition))
             session.addInput(newCaptureDeviceInput)
         } catch let error as NSError {
             session.commitConfiguration()
@@ -296,11 +287,9 @@ open class AVScannerViewController: UIViewController {
 
 // MARK: - AV Capture
 
-@available(iOS 10.0, *)
 extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
     public func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
         guard let barcodeObject = metadataObjects.first as? AVMetadataObject, let transformedMetadataObject = previewView.videoPreviewLayer.transformedMetadataObject(for: barcodeObject) as? AVMetadataMachineReadableCodeObject else { return }
-        print("captured output")
         sessionQueue.async { [unowned self] in
             self.session.stopRunning()
             self.isSessionRunning = self.session.isRunning
@@ -362,7 +351,15 @@ extension UIInterfaceOrientation {
 }
 
 extension AVCaptureDevice {
-    class func cameraWithPosition(position: AVCaptureDevicePosition) -> AVCaptureDevice? {
+    class func device(withPosition position: AVCaptureDevicePosition) -> AVCaptureDevice? {
+        if #available(iOS 10.0, *) {
+            if position == .back {
+                return AVCaptureDevice.defaultDevice(withDeviceType: .builtInDuoCamera, mediaType: AVMediaTypeVideo, position: .back) ??  AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .back)
+            } else {
+                return AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .front)
+            }
+        }
+        
         guard let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as? [AVCaptureDevice] else { return nil }
         for device in devices {
             if device.position == position {

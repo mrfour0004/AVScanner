@@ -9,11 +9,11 @@
 import UIKit
 import AVScanner
 
-@available(iOS 10.0, *)
 class ViewController: AVScannerViewController {
     
     @IBOutlet weak var cameraButton: UIButton!
     @IBAction func cameraChange(_ sender: Any) {
+        guard isSessionRunning else { return }
         flip()
     }
     

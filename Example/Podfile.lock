@@ -1,0 +1,16 @@
+PODS:
+  - AVScanner (0.1.0)
+
+DEPENDENCIES:
+  - AVScanner (from `../`)
+
+EXTERNAL SOURCES:
+  AVScanner:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  AVScanner: 0d7709bcd8d115d92272c733977dc0608c2726be
+
+PODFILE CHECKSUM: 61d0817ec5832126dd11b347aa3de8d96aeb98f6
+
+COCOAPODS: 1.1.1

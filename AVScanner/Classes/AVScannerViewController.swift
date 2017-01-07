@@ -221,7 +221,7 @@ open class AVScannerViewController: UIViewController {
     }
     
     public func flip() {
-        guard session != nil && session.inputs.count > 0 else { return }
+        guard session.inputs.count > 0 else { return }
         
         sessionQueue.async { [unowned self] in
             self.flipCamera()
@@ -264,6 +264,7 @@ open class AVScannerViewController: UIViewController {
             let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.device(withPosition: newPosition))
             session.addInput(newCaptureDeviceInput)
         } catch let error as NSError {
+            print(error.localizedDescription)
             session.commitConfiguration()
         }
         

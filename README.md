@@ -5,11 +5,11 @@
 [![License](https://img.shields.io/cocoapods/l/AVScanner.svg?style=flat)](http://cocoapods.org/pods/AVScanner)
 [![Platform](https://img.shields.io/cocoapods/p/AVScanner.svg?style=flat)](http://cocoapods.org/pods/AVScanner)
 
+==========
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
 
 ## Installation
 
@@ -19,10 +19,6 @@ it, simply add the following line to your Podfile:
 ```ruby
 pod "AVScanner"
 ```
-
-## Author
-
-mrfour, jason.liang@micromacro.com.tw
 
 ## License
 

@@ -35,7 +35,9 @@ class ViewController: AVScannerViewController {
     // MARK: - Prepare viewDidLoad
     
     private func prepareBarcodeHandler () {
-        barcodeHandler = barcodeDidCaptured
+        barcodeHandler = { (barcodeString) in
+            print("barcode did captured: \(barcodeString)")
+        }
     }
     
     private func prepareViewTapHandler() {
@@ -44,11 +46,6 @@ class ViewController: AVScannerViewController {
     }
     
     // MAKR: - AVScanner view handler
-    
-    func barcodeDidCaptured(barcodeString: String) {
-        print("barcode did captured: \(barcodeString)")
-    }
-    
     func viewTapHandler(_ gesture: UITapGestureRecognizer) {
         guard !isSessionRunning else { return }
         startRunningSession()

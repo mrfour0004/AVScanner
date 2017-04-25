@@ -28,16 +28,14 @@ class ViewController: AVScannerViewController {
         view.bringSubview(toFront: cameraButton)
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    deinit {
+        print("deinit")
     }
     
     // MARK: - Prepare viewDidLoad
     
     private func prepareBarcodeHandler () {
-        barcodeHandler = { (barcodeString) in
-            print("barcode did captured: \(barcodeString)")
-        }
+        barcodeHandler = barcodeDidCaptured
     }
     
     private func prepareViewTapHandler() {
@@ -46,8 +44,14 @@ class ViewController: AVScannerViewController {
     }
     
     // MAKR: - AVScanner view handler
+    lazy var barcodeDidCaptured: (_ barcodeString: String) -> Void = { barcodeString in
+        print("barcode did captured: \(barcodeString)")
+    }
+    
     func viewTapHandler(_ gesture: UITapGestureRecognizer) {
         guard !isSessionRunning else { return }
         startRunningSession()
-    }}
+    }
+}
+
 

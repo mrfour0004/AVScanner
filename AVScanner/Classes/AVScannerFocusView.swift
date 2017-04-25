@@ -35,16 +35,19 @@ public class AVScannerFocusView: UIView {
     // MARK: - Prepare view
     
     private func prepareView() {
+        alpha = 0
         layer.borderColor = borderColor.cgColor
         layer.borderWidth = 1.5
         layer.allowsEdgeAntialiasing = true
     }
     
-    // MARK: - Animation
-    
+}
+
+// MARK: - Animation
+
+extension AVScannerFocusView {
     func startAnimation() {
         guard let superview = superview else { return }
-        
         
         UIView.animate(withDuration: 0.1, animations: { [unowned self] in
             self.alpha = 0
@@ -65,7 +68,7 @@ public class AVScannerFocusView: UIView {
             
             UIView.animate(withDuration: 1.25, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut], animations: { [unowned self, targetOrigin] in
                 self.frame = CGRect(origin: targetOrigin, size: self.breathAnimationTargetSize)
-                }, completion: nil)
+            }, completion: nil)
         }
     }
     

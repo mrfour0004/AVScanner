@@ -10,7 +10,7 @@ import AVFoundation
 
 open class AVScannerViewController: UIViewController {
     
-    //ㄋopen var barcodeHandler: ((_ barcodeObject: AVMetadataMachineReadableCodeObject, _ barcodeCorners: [Any]) -> Void)?
+    //open var barcodeHandler: ((_ barcodeObject: AVMetadataMachineReadableCodeObject, _ barcodeCorners: [Any]) -> Void)?
     open var barcodeHandler: ((_ barcodeString: String) -> Void)?
     
     // MARK: - Device configuration
@@ -53,7 +53,7 @@ open class AVScannerViewController: UIViewController {
         case .authorized: break
         case .notDetermined:
             sessionQueue.suspend()
-            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { [unowned self] granted in
+            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { granted in
                 if !granted {
                     self.setupResult = .notAuthorized
                 }
@@ -63,7 +63,7 @@ open class AVScannerViewController: UIViewController {
             setupResult = .notAuthorized
         }
         
-        sessionQueue.async { [unowned self] in
+        sessionQueue.async {
             self.configureSession()
         }
     }
@@ -99,10 +99,9 @@ open class AVScannerViewController: UIViewController {
     }
     
     open override var shouldAutorotate: Bool {
-        get {
-            return isSessionRunning
-        }
+        return isSessionRunning
     }
+    
     // MARK: - Prepare view
     
     private func prepareView() {
@@ -158,9 +157,8 @@ open class AVScannerViewController: UIViewController {
                 session.commitConfiguration()
             }
             
-        } catch let error as NSError {
+        } catch let error {
             print(error.localizedDescription)
-            print("Could not add video device input to the session")
             setupResult = .configurationFailed
             session.commitConfiguration()
             return
@@ -181,11 +179,11 @@ open class AVScannerViewController: UIViewController {
             case .success:
                 self.session.startRunning()
                 self.isSessionRunning = self.session.isRunning
-                DispatchQueue.main.async { [unowned self] in
+                DispatchQueue.main.async {
                     self.focusView.startAnimation()
                 }
             case .notAuthorized:
-                DispatchQueue.main.async { [unowned self] in
+                DispatchQueue.main.async {
                     let message = NSLocalizedString("AVCam doesn't have permission to use the camera, please change privacy settings", comment: "Alert message when the user has denied access to the camera")
                     let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
@@ -200,7 +198,7 @@ open class AVScannerViewController: UIViewController {
                     self.present(alertController, animated: true, completion: nil)
                 }
             case .configurationFailed:
-                DispatchQueue.main.async { [unowned self] in
+                DispatchQueue.main.async {
                     let message = NSLocalizedString("Unable to capture media", comment: "Alert message when something goes wrong during capture session configuration")
                     let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
@@ -212,7 +210,7 @@ open class AVScannerViewController: UIViewController {
     }
     
     public func stopRunningSession() {
-        sessionQueue.async { [unowned self] in
+        sessionQueue.async {
             if self.setupResult == .success {
                 self.session.stopRunning()
                 self.isSessionRunning = self.session.isRunning
@@ -223,15 +221,13 @@ open class AVScannerViewController: UIViewController {
     public func flip() {
         guard session.inputs.count > 0 else { return }
         
-        sessionQueue.async { [unowned self] in
+        sessionQueue.async {
             self.flipCamera()
         }
     }
     
     fileprivate func flipCamera() {
-        
-        
-        DispatchQueue.main.async { [unowned self] in
+        DispatchQueue.main.async {
             self.focusView.stopAnimation()
             
             let blurView = UIVisualEffectView()
@@ -239,7 +235,6 @@ open class AVScannerViewController: UIViewController {
             blurView.tag = 100
             blurView.effect = UIBlurEffect(style: .light)
             self.previewView.addSubview(blurView)
-//            let screenshotImage = self.previewView.screenshotImage
             
             UIView.transition(with: self.previewView, duration: 0.4, options: [.transitionFlipFromLeft, .curveEaseInOut], animations: nil, completion: { _ in
                 UIView.transition(with: self.previewView, duration: 0.2, options: [.transitionCrossDissolve], animations: {
@@ -270,9 +265,9 @@ open class AVScannerViewController: UIViewController {
         
         session.commitConfiguration()
         
-//        DispatchQueue.main.async { [unowned self] in
+//        DispatchQueue.main.async { 
 //            if let blurView = self.previewView.viewWithTag(100) {
-//                UIView.transition(with: self.previewView, duration: 0.1, options: [.transitionCrossDissolve, .curveEaseInOut], animations: { [unowned blurView] in
+//                UIView.transition(with: self.previewView, duration: 0.1, options: [.transitionCrossDissolve, .curveEaseInOut], animations: {
 //                    blurView.removeFromSuperview()
 //                }, completion: nil)
 ////                UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
@@ -291,37 +286,18 @@ open class AVScannerViewController: UIViewController {
 extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
     public func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
         guard let barcodeObject = metadataObjects.first as? AVMetadataObject, let transformedMetadataObject = previewView.videoPreviewLayer.transformedMetadataObject(for: barcodeObject) as? AVMetadataMachineReadableCodeObject else { return }
-        sessionQueue.async { [unowned self] in
+        sessionQueue.async {
             self.session.stopRunning()
             self.isSessionRunning = self.session.isRunning
             
-            DispatchQueue.main.async { [unowned self] in
-                self.focusView.transform(to: transformedMetadataObject.corners) { [unowned self] in
+            DispatchQueue.main.async {
+                self.focusView.transform(to: transformedMetadataObject.corners) {
                     self.barcodeHandler?(transformedMetadataObject.stringValue)
                 }
             }
         }
     }
 }
-
-/*
- extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
- func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
- var barcodeObjects = [AVMetadataMachineReadableCodeObject]()
- var corners = [Any]()
- 
- for metadataObject in metadataObjects as! [AVMetadataObject] {
- guard let transformedMetadataObject = previewView.videoPreviewLayer.transformedMetadataObject(for: metadataObject), transformedMetadataObject is AVMetadataMachineReadableCodeObject else { continue }
- let barcodeObject = transformedMetadataObject as! AVMetadataMachineReadableCodeObject
- barcodeObjects.append(barcodeObject)
- corners.append(barcodeObject.corners)
- }
- 
- guard barcodeObjects.count > 0 else { return }
- barcodeHandler?(barcodeObjects, corners)
- }
- }
- */
 
 // MARK: - Device orientation
 

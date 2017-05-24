@@ -10,10 +10,24 @@ import AVFoundation
 
 open class AVScannerViewController: UIViewController {
     
-    //open var barcodeHandler: ((_ barcodeObject: AVMetadataMachineReadableCodeObject, _ barcodeCorners: [Any]) -> Void)?
-    open var barcodeHandler: ((_ barcodeString: String) -> Void)?
+    // MARK: - Open Properties
+    
+    open var barcodeHandler: ((_ codeObject: AVMetadataMachineReadableCodeObject) -> Void)?
+//    open var barcodeHandler: ((_ barcodeString: String) -> Void)?
     
     // MARK: - Device configuration
+    
+    open var supportedMetadataObjectTypes: [Any] = [AVMetadataObjectTypeQRCode] {
+        didSet {
+            guard setupResult == .success else { return }
+            sessionQueue.async {
+                print("did set supportedMetadataObjectTypes")
+                self.session.beginConfiguration()
+                self.captureMetaDataOutput.metadataObjectTypes = self.supportedMetadataObjectTypes
+                self.session.commitConfiguration()
+            }
+        }
+    }
     
     // MARK: - Session management
     
@@ -30,7 +44,7 @@ open class AVScannerViewController: UIViewController {
     fileprivate var videoDeviceInput: AVCaptureDeviceInput!
     fileprivate var setupResult: SessionSetupResult = .success
     
-    open var isSessionRunning = false
+    public var isSessionRunning = false
     
     
     // MARK: - Meta data output
@@ -73,9 +87,9 @@ open class AVScannerViewController: UIViewController {
         startRunningSession()
     }
     
-    open override func viewWillDisappear(_ animated: Bool) {
+    open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         stopRunningSession()
-        super.viewWillDisappear(animated)
     }
     
     open override func viewDidLayoutSubviews() {
@@ -121,7 +135,6 @@ open class AVScannerViewController: UIViewController {
     }
     
     private func prepareFocusView() {
-        //        focusView.alpha = 0
         view.addSubview(focusView)
         view.bringSubview(toFront: focusView)
     }
@@ -130,6 +143,8 @@ open class AVScannerViewController: UIViewController {
     
     private func configureSession() {
         guard setupResult == .success else { return }
+        
+        print("start configure session")
         
         session.beginConfiguration()
         
@@ -166,7 +181,7 @@ open class AVScannerViewController: UIViewController {
         
         session.addOutput(captureMetaDataOutput)
         captureMetaDataOutput.setMetadataObjectsDelegate(self, queue: sessionQueue)
-        captureMetaDataOutput.metadataObjectTypes = [AVMetadataObjectTypeQRCode]
+        captureMetaDataOutput.metadataObjectTypes = supportedMetadataObjectTypes
         
         session.commitConfiguration()
     }
@@ -218,6 +233,7 @@ open class AVScannerViewController: UIViewController {
         }
     }
     
+    /// Flip the camera between front and back camera 
     public func flip() {
         guard session.inputs.count > 0 else { return }
         
@@ -292,7 +308,7 @@ extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
             
             DispatchQueue.main.async {
                 self.focusView.transform(to: transformedMetadataObject.corners) {
-                    self.barcodeHandler?(transformedMetadataObject.stringValue)
+                    self.barcodeHandler?(transformedMetadataObject)
                 }
             }
         }

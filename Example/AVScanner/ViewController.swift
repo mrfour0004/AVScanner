@@ -7,7 +7,9 @@
 //
 
 import UIKit
+import AVFoundation
 import AVScanner
+import SafariServices
 
 class ViewController: AVScannerViewController {
     
@@ -26,6 +28,7 @@ class ViewController: AVScannerViewController {
         prepareViewTapHandler()
         
         view.bringSubview(toFront: cameraButton)
+        supportedMetadataObjectTypes = [AVMetadataObjectTypeQRCode, AVMetadataObjectTypePDF417Code]
     }
     
     deinit {
@@ -44,13 +47,36 @@ class ViewController: AVScannerViewController {
     }
     
     // MAKR: - AVScanner view handler
-    lazy var barcodeDidCaptured: (_ barcodeString: String) -> Void = { barcodeString in
-        print("barcode did captured: \(barcodeString)")
+    
+    // Be careful with retain cycle
+    lazy var barcodeDidCaptured: (_ codeObject: AVMetadataMachineReadableCodeObject) -> Void = { [unowned self] codeObject in
+        let string = codeObject.stringValue!
+        
+        if #available(iOS 9.0, *), let url = URL(string: string), UIApplication.shared.canOpenURL(url) {
+            self.openSafariViewController(with: url)
+        } else {
+            let alertViewController = UIAlertController(title: "Code String", message: string, preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK", style: .default, handler: { _ in
+                alertViewController.dismiss(animated: true)
+                self.startRunningSession()
+            })
+            alertViewController.addAction(action)
+            self.present(alertViewController, animated: true, completion: nil)
+        }
     }
     
     func viewTapHandler(_ gesture: UITapGestureRecognizer) {
         guard !isSessionRunning else { return }
         startRunningSession()
+    }
+}
+
+extension ViewController {
+    @available(iOS 9.0, *)
+    fileprivate func openSafariViewController(with url: URL) {
+        let safariView = SFSafariViewController(url: url)
+        safariView.modalPresentationStyle = .popover
+        present(safariView, animated: true, completion: nil)
     }
 }
 

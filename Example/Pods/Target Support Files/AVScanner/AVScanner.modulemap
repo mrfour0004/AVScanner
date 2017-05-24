@@ -1,0 +1,6 @@
+framework module AVScanner {
+  umbrella header "AVScanner-umbrella.h"
+
+  export *
+  module * { export * }
+}

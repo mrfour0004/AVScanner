@@ -18,6 +18,12 @@ it, simply add the following line to your Podfile:
 pod "AVScanner"
 ```
 
+## Reguirement
+
+- iOS 8.0+
+- Xcode 9.0
+- Swift 4.0
+
 ## Usage
 
 In your UIViewController class, import the following framework

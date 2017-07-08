@@ -17,6 +17,7 @@ class ViewController: AVScannerViewController {
     @IBAction func cameraChange(_ sender: Any) {
         guard isSessionRunning else { return }
         flip()
+        
     }
     
     // MARK: - View controller life cycle
@@ -28,7 +29,7 @@ class ViewController: AVScannerViewController {
         prepareViewTapHandler()
         
         view.bringSubview(toFront: cameraButton)
-        supportedMetadataObjectTypes = [AVMetadataObjectTypeQRCode, AVMetadataObjectTypePDF417Code]
+        supportedMetadataObjectTypes = [.qr, .pdf417]
     }
     
     deinit {
@@ -65,7 +66,8 @@ class ViewController: AVScannerViewController {
         }
     }
     
-    func viewTapHandler(_ gesture: UITapGestureRecognizer) {
+    
+    @objc func viewTapHandler(_ gesture: UITapGestureRecognizer) {
         guard !isSessionRunning else { return }
         startRunningSession()
     }

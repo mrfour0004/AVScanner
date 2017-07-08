@@ -13,11 +13,10 @@ open class AVScannerViewController: UIViewController {
     // MARK: - Open Properties
     
     open var barcodeHandler: ((_ codeObject: AVMetadataMachineReadableCodeObject) -> Void)?
-//    open var barcodeHandler: ((_ barcodeString: String) -> Void)?
     
     // MARK: - Device configuration
     
-    open var supportedMetadataObjectTypes: [Any] = [AVMetadataObjectTypeQRCode] {
+    open var supportedMetadataObjectTypes: [AVMetadataObject.ObjectType] = [.qr] {
         didSet {
             guard setupResult == .success else { return }
             sessionQueue.async {
@@ -63,11 +62,11 @@ open class AVScannerViewController: UIViewController {
         
         previewView.session = session
         
-        switch AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo) {
+        switch AVCaptureDevice.authorizationStatus(for: AVMediaType.video) {
         case .authorized: break
         case .notDetermined:
             sessionQueue.suspend()
-            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { granted in
+            AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: { granted in
                 if !granted {
                     self.setupResult = .notAuthorized
                 }
@@ -150,7 +149,7 @@ open class AVScannerViewController: UIViewController {
         
         do {
             let defaultVideoDevice = AVCaptureDevice.device(withPosition: .back) ?? AVCaptureDevice.device(withPosition: .front)
-            let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice)
+            let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice!)
             
             if session.canAddInput(videoDeviceInput) {
                 session.addInput(videoDeviceInput)
@@ -165,7 +164,7 @@ open class AVScannerViewController: UIViewController {
                         }
                     }
                     
-                    self.previewView.videoPreviewLayer.connection.videoOrientation = initialVideoOrientation
+                    self.previewView.videoPreviewLayer.connection?.videoOrientation = initialVideoOrientation
                 }
             } else {
                 setupResult = .configurationFailed
@@ -269,10 +268,10 @@ open class AVScannerViewController: UIViewController {
         }
         
         session.removeInput(currentCaptureInput)
-        let newPosition: AVCaptureDevicePosition = currentCaptureInput.device.position == .front ? .back : .front
+        let newPosition: AVCaptureDevice.Position = currentCaptureInput.device.position == .front ? .back : .front
         
         do {
-            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.device(withPosition: newPosition))
+            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.device(withPosition: newPosition)!)
             session.addInput(newCaptureDeviceInput)
         } catch let error as NSError {
             print(error.localizedDescription)
@@ -300,15 +299,16 @@ open class AVScannerViewController: UIViewController {
 // MARK: - AV Capture
 
 extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
-    public func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
-        guard let barcodeObject = metadataObjects.first as? AVMetadataObject, let transformedMetadataObject = previewView.videoPreviewLayer.transformedMetadataObject(for: barcodeObject) as? AVMetadataMachineReadableCodeObject else { return }
-        sessionQueue.async {
-            self.session.stopRunning()
-            self.isSessionRunning = self.session.isRunning
-            
-            DispatchQueue.main.async {
-                self.focusView.transform(to: transformedMetadataObject.corners) {
-                    self.barcodeHandler?(transformedMetadataObject)
+    public func metadataOutput(_ captureOutput: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        DispatchQueue.main.async {
+            guard let barcodeObject = metadataObjects.first, let transformedMetadataObject = self.previewView.videoPreviewLayer.transformedMetadataObject(for: barcodeObject) as? AVMetadataMachineReadableCodeObject else { return }
+            self.sessionQueue.async {
+                self.session.stopRunning()
+                self.isSessionRunning = self.session.isRunning
+                DispatchQueue.main.async {
+                    self.focusView.transform(to: transformedMetadataObject.corners) {
+                        self.barcodeHandler?(transformedMetadataObject)
+                    }
                 }
             }
         }
@@ -344,16 +344,16 @@ extension UIInterfaceOrientation {
 }
 
 extension AVCaptureDevice {
-    class func device(withPosition position: AVCaptureDevicePosition) -> AVCaptureDevice? {
+    class func device(withPosition position: AVCaptureDevice.Position) -> AVCaptureDevice? {
         if #available(iOS 10.0, *) {
             if position == .back {
-                return AVCaptureDevice.defaultDevice(withDeviceType: .builtInDuoCamera, mediaType: AVMediaTypeVideo, position: .back) ??  AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .back)
+                return AVCaptureDevice.default(.builtInDuoCamera, for: .video, position: .back) ??  AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
             } else {
-                return AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .front)
+                return AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .front)
             }
         }
         
-        guard let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as? [AVCaptureDevice] else { return nil }
+        let devices = AVCaptureDevice.devices(for: AVMediaType.video)
         for device in devices {
             if device.position == position {
                 return device

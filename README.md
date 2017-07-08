@@ -41,7 +41,7 @@ override viewDidLoad() {
 
     // Set up `supportedMetadataObjectTypes` if needed, 
     // it only support `AVMetadataObjectTypeQRCode` by default.
-    supportedMetadataObjectTypes = [AVMetadataObjectTypeQRCode, AVMetadataObjectTypePDF417Code]
+    supportedMetadataObjectTypes = [.qr, .pdf417]    
 
     // If you have set up any views in storyboard or xib, remember to bring them to front.
     view.bringSubview(toFront: myView)

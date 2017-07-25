@@ -148,7 +148,7 @@ open class AVScannerViewController: UIViewController {
         session.beginConfiguration()
         
         do {
-            let defaultVideoDevice = AVCaptureDevice.device(withPosition: .back) ?? AVCaptureDevice.device(withPosition: .front)
+            let defaultVideoDevice = AVCaptureDevice.device(with: .back) ?? AVCaptureDevice.device(with: .front)
             let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice!)
             
             if session.canAddInput(videoDeviceInput) {
@@ -271,7 +271,7 @@ open class AVScannerViewController: UIViewController {
         let newPosition: AVCaptureDevice.Position = currentCaptureInput.device.position == .front ? .back : .front
         
         do {
-            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.device(withPosition: newPosition)!)
+            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.device(with: newPosition)!)
             session.addInput(newCaptureDeviceInput)
         } catch let error as NSError {
             print(error.localizedDescription)
@@ -306,7 +306,7 @@ extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
                 self.session.stopRunning()
                 self.isSessionRunning = self.session.isRunning
                 DispatchQueue.main.async {
-                    self.focusView.transform(to: transformedMetadataObject.corners) {
+                    self.focusView.transform(to: transformedMetadataObject.__corners) {
                         self.barcodeHandler?(transformedMetadataObject)
                     }
                 }
@@ -344,20 +344,10 @@ extension UIInterfaceOrientation {
 }
 
 extension AVCaptureDevice {
-    class func device(withPosition position: AVCaptureDevice.Position) -> AVCaptureDevice? {
-        if #available(iOS 10.0, *) {
-            if position == .back {
-                return AVCaptureDevice.default(.builtInDuoCamera, for: .video, position: .back) ??  AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
-            } else {
-                return AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .front)
-            }
-        }
-        
-        let devices = AVCaptureDevice.devices(for: AVMediaType.video)
-        for device in devices {
-            if device.position == position {
-                return device
-            }
+    class func device(with position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+        let devices = AVCaptureDevice.devices(for: .video)
+        for device in devices where device.position == position {
+            return device
         }
         return nil
     }

@@ -13,6 +13,8 @@
 		6ACF4FB6D7E80056308EF07FC790843A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */; };
 		74E6221F15BECD70DACFDDBD5D1CF7F0 /* Pods-AVScanner_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D53B4624FB35FB50C499DC64B8D7406 /* Pods-AVScanner_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		91ABE4C59CD033506B0D131BAFEA3A42 /* AVScannerPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC81434E0E5CAC878F29EE4608ACAFAE /* AVScannerPreviewView.swift */; };
+		9ED13E0F20737A46003380DD /* AVFoundation+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ED13E0E20737A46003380DD /* AVFoundation+Extension.swift */; };
+		9EF477031FA96D0C00B0A591 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF477021FA96D0C00B0A591 /* Util.swift */; };
 		BBBCC3CB0158BFF651399BAFFF009A17 /* AVScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021854E26E6EA3431067A2D65F3A7D9A /* AVScannerViewController.swift */; };
 		C110611D2755CE559AACBA642862AD47 /* Pods-AVScanner_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 80D822365FDBD6D2791804BC588BE09C /* Pods-AVScanner_Example-dummy.m */; };
 		DC2160A885C3B3AD06CEC8FD98014027 /* AVScanner-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5829DA03E8D1ED25DBCC711604D93F15 /* AVScanner-dummy.m */; };
@@ -55,6 +57,8 @@
 		9249DBB4124E2EE61CEDFE22F5165297 /* Pods-AVScanner_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-AVScanner_Example-resources.sh"; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9C72660F438025F3ED5952AFA57FDBC7 /* Pods-AVScanner_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-AVScanner_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
+		9ED13E0E20737A46003380DD /* AVFoundation+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVFoundation+Extension.swift"; sourceTree = "<group>"; };
+		9EF477021FA96D0C00B0A591 /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		A7F1F5BF95D17B16B047769945269B15 /* Pods_AVScanner_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVScanner_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A992A89BF58257830012B857135221EE /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B3925D514AEE741D9ECEDAF03E66BB3D /* Pods-AVScanner_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-AVScanner_Tests.modulemap"; sourceTree = "<group>"; };
@@ -203,9 +207,11 @@
 		CAD7D2FD2ABE115E4BB8DB06DCC33570 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9ED13E0E20737A46003380DD /* AVFoundation+Extension.swift */,
 				28C5C244BF37FC60036955BE663D8702 /* AVScannerFocusView.swift */,
 				CC81434E0E5CAC878F29EE4608ACAFAE /* AVScannerPreviewView.swift */,
 				021854E26E6EA3431067A2D65F3A7D9A /* AVScannerViewController.swift */,
+				9EF477021FA96D0C00B0A591 /* Util.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -317,7 +323,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0930;
 				TargetAttributes = {
 					2B19669A67F8578F823739FA35CC76D3 = {
 						LastSwiftMigration = 0900;
@@ -350,8 +356,10 @@
 			files = (
 				DC2160A885C3B3AD06CEC8FD98014027 /* AVScanner-dummy.m in Sources */,
 				518267CE21350958F848249EFEEB67A3 /* AVScannerFocusView.swift in Sources */,
+				9EF477031FA96D0C00B0A591 /* Util.swift in Sources */,
 				91ABE4C59CD033506B0D131BAFEA3A42 /* AVScannerPreviewView.swift in Sources */,
 				BBBCC3CB0158BFF651399BAFFF009A17 /* AVScannerViewController.swift in Sources */,
+				9ED13E0F20737A46003380DD /* AVFoundation+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,12 +404,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -429,7 +439,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -492,7 +502,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/AVScanner/AVScanner-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/AVScanner/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/AVScanner/AVScanner.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -521,12 +531,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -550,7 +562,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
 				STRIP_INSTALLED_PRODUCT = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -683,7 +695,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/AVScanner/AVScanner-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/AVScanner/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/AVScanner/AVScanner.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;

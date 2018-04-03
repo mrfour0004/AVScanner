@@ -49,9 +49,10 @@ extension AVScannerFocusView {
     func startAnimation() {
         guard let superview = superview else { return }
         
-        UIView.animate(withDuration: 0.1, animations: { [unowned self] in
+        UIView.animate(withDuration: 0.1, animations: {
             self.alpha = 0
-        }) { [unowned self, superview] _ in
+        }, completion: { [weak self, superview] _ in
+            guard let `self` = self else { return }
             self.layer.transform = CATransform3DIdentity
             self.layer.removeAllAnimations()
             
@@ -62,22 +63,22 @@ extension AVScannerFocusView {
             let targetY = superview.center.y - self.breathAnimationTargetSize.height / 2
             let targetOrigin = CGPoint(x: targetX, y: targetY)
             
-            UIView.animate(withDuration: 0.1, animations: { [unowned self] in
+            UIView.animate(withDuration: 0.1, animations: {
                 self.alpha = 1
             })
             
             UIView.animate(withDuration: 1.25, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut], animations: { [unowned self, targetOrigin] in
                 self.frame = CGRect(origin: targetOrigin, size: self.breathAnimationTargetSize)
             }, completion: nil)
-        }
+        })
     }
     
     func stopAnimation() {
-        UIView.animate(withDuration: 0.1, animations: { [unowned self] in
+        UIView.animate(withDuration: 0.1, animations: {
             self.alpha = 0
-        }) { [unowned self] _ in
-            self.layer.removeAllAnimations()
-        }
+        }, completion: { [weak self] _ in
+            self?.layer.removeAllAnimations()
+        })
     }
     
     func transform(to corners: [Any], completion: (() -> Void)? = nil) {
@@ -89,8 +90,12 @@ extension AVScannerFocusView {
         
         transformTo(topLeft: topLeftCorner, bottomLeft: bottomLeftCorner, bottomRight: bottomRightCorner, topRight: topRightCorner, completion: completion)
     }
-    
-    private func transformTo(topLeft tl: CGPoint, bottomLeft bl: CGPoint, bottomRight br: CGPoint, topRight tr: CGPoint, completion: (() -> Void)? = nil) {
+}
+
+// MARK: - Transform helpers
+
+fileprivate extension AVScannerFocusView {
+    func transformTo(topLeft tl: CGPoint, bottomLeft bl: CGPoint, bottomRight br: CGPoint, topRight tr: CGPoint, completion: (() -> Void)? = nil) {
         guard self.layer.anchorPoint.equalTo(CGPoint.zero) else { return }
         
         let b: CGRect = boundingBoxForQuadTR(topLeft: tl, topRight: tr, bottomLeft: bl, bottomRight: br)
@@ -111,7 +116,7 @@ extension AVScannerFocusView {
         
     }
     
-    private func boundingBoxForQuadTR(topLeft tl: CGPoint, topRight tr: CGPoint, bottomLeft bl: CGPoint, bottomRight br: CGPoint) -> CGRect {
+    func boundingBoxForQuadTR(topLeft tl: CGPoint, topRight tr: CGPoint, bottomLeft bl: CGPoint, bottomRight br: CGPoint) -> CGRect {
         var b: CGRect = CGRect.zero
         
         let xmin: CGFloat = min(min(min(tr.x, tl.x), bl.x),br.x);
@@ -127,11 +132,11 @@ extension AVScannerFocusView {
         return b;
     }
     
-    private func rectToQuad(rect: CGRect, topLeft tl: CGPoint, topRight tr: CGPoint, bottomLeft bl: CGPoint, bottomRight br: CGPoint) -> CATransform3D {
+    func rectToQuad(rect: CGRect, topLeft tl: CGPoint, topRight tr: CGPoint, bottomLeft bl: CGPoint, bottomRight br: CGPoint) -> CATransform3D {
         return rectToQuad(rect: rect, x1a: tl.x, y1a: tl.y, x2a: tr.x, y2a: tr.y, x3a: bl.x, y3a: bl.y, x4a: br.x, y4a: br.y)
     }
     
-    private func rectToQuad(rect: CGRect, x1a: CGFloat, y1a: CGFloat, x2a: CGFloat, y2a: CGFloat, x3a: CGFloat, y3a: CGFloat, x4a: CGFloat, y4a: CGFloat) -> CATransform3D {
+    func rectToQuad(rect: CGRect, x1a: CGFloat, y1a: CGFloat, x2a: CGFloat, y2a: CGFloat, x3a: CGFloat, y3a: CGFloat, x4a: CGFloat, y4a: CGFloat) -> CATransform3D {
         let X = rect.origin.x;
         let Y = rect.origin.y;
         let W = rect.size.width;

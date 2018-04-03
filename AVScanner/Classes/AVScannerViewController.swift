@@ -14,13 +14,10 @@ open class AVScannerViewController: UIViewController {
     
     open var barcodeHandler: ((_ codeObject: AVMetadataMachineReadableCodeObject) -> Void)?
     
-    // MARK: - Device configuration
-    
     open var supportedMetadataObjectTypes: [AVMetadataObject.ObjectType] = [.qr] {
         didSet {
-            guard setupResult == .success else { return }
             sessionQueue.async {
-                print("did set supportedMetadataObjectTypes")
+                guard self.setupResult == .success else { return }
                 self.session.beginConfiguration()
                 self.captureMetaDataOutput.metadataObjectTypes = self.supportedMetadataObjectTypes
                 self.session.commitConfiguration()
@@ -28,23 +25,29 @@ open class AVScannerViewController: UIViewController {
         }
     }
     
+    open var alertTitle: String? = nil
+    open var alertErrorTitle: String? = nil
+    open var alertConfirmTitle = NSLocalizedString("OK", comment: "")
+    open var alertSettingsTitle = NSLocalizedString("Settings", comment: "")
+    open var cameraPermissionRequestMessage = NSLocalizedString("AVCam doesn't have permission to use the camera, please change privacy settings", comment: "Alert message when the user has denied access to the camera")
+    open var configurSessionFailureMessage = NSLocalizedString("Unable to capture media", comment: "Alert message when something goes wrong during capture session configuration")
+    
     // MARK: - Session management
     
-    fileprivate enum SessionSetupResult {
+    private enum SessionSetupResult {
         case success
         case notAuthorized
         case configurationFailed
     }
     
-    fileprivate let previewView = AVScannerPreviewView()
-    fileprivate let session = AVCaptureSession()
-    fileprivate let sessionQueue = DispatchQueue(label: "session queue")
+    private let previewView = AVScannerPreviewView()
+    private let session = AVCaptureSession()
+    private let sessionQueue = DispatchQueue(label: "AVScannerSessionQueue")
     
-    fileprivate var videoDeviceInput: AVCaptureDeviceInput!
-    fileprivate var setupResult: SessionSetupResult = .success
+    private var videoDeviceInput: AVCaptureDeviceInput!
+    private var setupResult: SessionSetupResult = .success
     
     public var isSessionRunning = false
-    
     
     // MARK: - Meta data output
     
@@ -54,31 +57,11 @@ open class AVScannerViewController: UIViewController {
     
     public let focusView = AVScannerFocusView(frame: CGRect(x: 0, y: 0, width: 200, height: 200))
     
-    // MARK: - View controller life cycle
+    // MARK: - Life cycle
     
     open override func viewDidLoad() {
         super.viewDidLoad()
         prepareView()
-        
-        previewView.session = session
-        
-        switch AVCaptureDevice.authorizationStatus(for: AVMediaType.video) {
-        case .authorized: break
-        case .notDetermined:
-            sessionQueue.suspend()
-            AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: { granted in
-                if !granted {
-                    self.setupResult = .notAuthorized
-                }
-                self.sessionQueue.resume()
-            })
-        default:
-            setupResult = .notAuthorized
-        }
-        
-        sessionQueue.async {
-            self.configureSession()
-        }
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -114,78 +97,13 @@ open class AVScannerViewController: UIViewController {
     open override var shouldAutorotate: Bool {
         return isSessionRunning
     }
+}
+
+// MARK: - Public functions
+
+extension AVScannerViewController {
     
-    // MARK: - Prepare view
-    
-    private func prepareView() {
-        preparePreviewView()
-        prepareFocusView()
-    }
-    
-    private func preparePreviewView() {
-        view.addSubview(previewView)
-        
-        previewView.translatesAutoresizingMaskIntoConstraints = false
-        let centerXConstraint = NSLayoutConstraint(item: view, attribute: .centerX, relatedBy: .equal, toItem: previewView, attribute: .centerX, multiplier: 1, constant: 0)
-        let centerYConstraint = NSLayoutConstraint(item: view, attribute: .centerY, relatedBy: .equal, toItem: previewView, attribute: .centerY, multiplier: 1, constant: 0)
-        let heightConstraint  = NSLayoutConstraint(item: view, attribute: .height, relatedBy: .equal, toItem: previewView, attribute: .height, multiplier: 1, constant: 0)
-        let widthConstraint   = NSLayoutConstraint(item: view, attribute: .width, relatedBy: .equal, toItem: previewView, attribute: .width, multiplier: 1, constant: 0)
-        NSLayoutConstraint.activate([centerXConstraint, centerYConstraint, heightConstraint, widthConstraint])
-    }
-    
-    private func prepareFocusView() {
-        view.addSubview(focusView)
-        view.bringSubview(toFront: focusView)
-    }
-    
-    // MARK: - Configure
-    
-    private func configureSession() {
-        guard setupResult == .success else { return }
-        
-        print("start configure session")
-        
-        session.beginConfiguration()
-        
-        do {
-            let defaultVideoDevice = AVCaptureDevice.device(with: .back) ?? AVCaptureDevice.device(with: .front)
-            let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice!)
-            
-            if session.canAddInput(videoDeviceInput) {
-                session.addInput(videoDeviceInput)
-                self.videoDeviceInput = videoDeviceInput
-                
-                DispatchQueue.main.async {
-                    let statusBarOrientation = UIApplication.shared.statusBarOrientation
-                    var initialVideoOrientation: AVCaptureVideoOrientation = .portrait
-                    if statusBarOrientation != .unknown {
-                        if let videoOrientation = statusBarOrientation.videoOrientation {
-                            initialVideoOrientation = videoOrientation
-                        }
-                    }
-                    
-                    self.previewView.videoPreviewLayer.connection?.videoOrientation = initialVideoOrientation
-                }
-            } else {
-                setupResult = .configurationFailed
-                session.commitConfiguration()
-            }
-            
-        } catch let error {
-            print(error.localizedDescription)
-            setupResult = .configurationFailed
-            session.commitConfiguration()
-            return
-        }
-        
-        session.addOutput(captureMetaDataOutput)
-        captureMetaDataOutput.setMetadataObjectsDelegate(self, queue: sessionQueue)
-        captureMetaDataOutput.metadataObjectTypes = supportedMetadataObjectTypes
-        
-        session.commitConfiguration()
-    }
-    
-    // MARK: - Session control
+    // MARK: Session control
     
     public func startRunningSession() {
         sessionQueue.async {
@@ -198,25 +116,12 @@ open class AVScannerViewController: UIViewController {
                 }
             case .notAuthorized:
                 DispatchQueue.main.async {
-                    let message = NSLocalizedString("AVCam doesn't have permission to use the camera, please change privacy settings", comment: "Alert message when the user has denied access to the camera")
-                    let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
-                    alertController.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: "Alert button to open Settings"), style: .`default`, handler: { action in
-                        if #available(iOS 10.0, *) {
-                            UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
-                        } else {
-                            UIApplication.shared.openURL(URL(string: UIApplicationOpenSettingsURLString)!)
-                        }
-                    }))
-                    
-                    self.present(alertController, animated: true, completion: nil)
+                    self.requestCameraPermission()
                 }
             case .configurationFailed:
                 DispatchQueue.main.async {
-                    let message = NSLocalizedString("Unable to capture media", comment: "Alert message when something goes wrong during capture session configuration")
-                    let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
-                    
+                    let alertController = UIAlertController(title: self.alertErrorTitle, message: self.configurSessionFailureMessage, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: self.alertConfirmTitle, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
                 }
             }
@@ -232,16 +137,22 @@ open class AVScannerViewController: UIViewController {
         }
     }
     
-    /// Flip the camera between front and back camera 
+    // MARK: Camera control
+    
+    /// Flip the camera between front and back camera
     public func flip() {
-        guard session.inputs.count > 0 else { return }
+        guard !session.inputs.isEmpty else { return }
         
         sessionQueue.async {
             self.flipCamera()
         }
     }
-    
-    fileprivate func flipCamera() {
+}
+
+// MARK: - Private functions
+
+fileprivate extension AVScannerViewController {
+    func flipCamera() {
         DispatchQueue.main.async {
             self.focusView.stopAnimation()
             
@@ -271,29 +182,128 @@ open class AVScannerViewController: UIViewController {
         let newPosition: AVCaptureDevice.Position = currentCaptureInput.device.position == .front ? .back : .front
         
         do {
-            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.device(with: newPosition)!)
+            let newCaptureDeviceInput = try AVCaptureDeviceInput(device: AVCaptureDevice.default(position: newPosition)!)
             session.addInput(newCaptureDeviceInput)
         } catch let error as NSError {
-            print(error.localizedDescription)
+            loggingPrint(error.localizedDescription)
             session.commitConfiguration()
         }
         
         session.commitConfiguration()
-        
-//        DispatchQueue.main.async { 
-//            if let blurView = self.previewView.viewWithTag(100) {
-//                UIView.transition(with: self.previewView, duration: 0.1, options: [.transitionCrossDissolve, .curveEaseInOut], animations: {
-//                    blurView.removeFromSuperview()
-//                }, completion: nil)
-////                UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-////                    blurView.removeFromSuperview()
-////                }, completion: nil)
-//            }
-//        }
     }
     
-    // MARK: - KVO and Notification
+    func requestCameraPermission() {
+        let message = cameraPermissionRequestMessage
+        let alertController = UIAlertController(title: self.alertTitle, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: self.alertConfirmTitle, style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: self.alertSettingsTitle, style: .default, handler: { action in
+            UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+        }))
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+}
+
+// MARK: - Prepare view
+
+fileprivate extension AVScannerViewController {
+    func prepareView() {
+        prepareSession()
+        preparePreviewView()
+        prepareFocusView()
+    }
     
+    private func preparePreviewView() {
+        view.addSubview(previewView)
+        
+        previewView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: previewView.topAnchor),
+            view.leadingAnchor.constraint(equalTo: previewView.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: previewView.trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: previewView.bottomAnchor)
+        ])
+    }
+    
+    private func prepareFocusView() {
+        view.addSubview(focusView)
+        view.bringSubview(toFront: focusView)
+    }
+    
+    // MARK: - Configure
+    
+    private func prepareSession() {
+        previewView.session = session
+        previewView.videoPreviewLayer.videoGravity = .resizeAspectFill
+        
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized: break
+        case .notDetermined:
+            sessionQueue.suspend()
+            AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
+                if !granted {
+                    self.setupResult = .notAuthorized
+                }
+                self.sessionQueue.resume()
+            })
+        default:
+            setupResult = .notAuthorized
+        }
+        
+        sessionQueue.async {
+            self.configureSession()
+        }
+    }
+    
+    private func configureSession() {
+        guard setupResult == .success else { return }
+        
+        loggingPrint("start configure session")
+        
+        session.beginConfiguration()
+        
+        guard let defaultVideoDevice = AVCaptureDevice.default(position: .back) ?? AVCaptureDevice.default(position: .front) else {
+            setupResult = .configurationFailed
+            session.commitConfiguration()
+            return
+        }
+        
+        do {
+            let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice)
+            
+            if session.canAddInput(videoDeviceInput) {
+                session.addInput(videoDeviceInput)
+                self.videoDeviceInput = videoDeviceInput
+                
+                DispatchQueue.main.async {
+                    let statusBarOrientation = UIApplication.shared.statusBarOrientation
+                    var initialVideoOrientation: AVCaptureVideoOrientation = .portrait
+                    if statusBarOrientation != .unknown {
+                        if let videoOrientation = statusBarOrientation.videoOrientation {
+                            initialVideoOrientation = videoOrientation
+                        }
+                    }
+                    
+                    self.previewView.videoPreviewLayer.connection?.videoOrientation = initialVideoOrientation
+                }
+            } else {
+                setupResult = .configurationFailed
+                session.commitConfiguration()
+            }
+            
+        } catch let error {
+            loggingPrint(error.localizedDescription)
+            setupResult = .configurationFailed
+            session.commitConfiguration()
+            return
+        }
+        
+        session.addOutput(captureMetaDataOutput)
+        captureMetaDataOutput.setMetadataObjectsDelegate(self, queue: sessionQueue)
+        captureMetaDataOutput.metadataObjectTypes = supportedMetadataObjectTypes
+        
+        session.commitConfiguration()
+    }
 }
 
 // MARK: - AV Capture
@@ -314,66 +324,4 @@ extension AVScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
         }
     }
 }
-
-// MARK: - Device orientation
-
-extension UIDeviceOrientation {
-    var videoOrientation: AVCaptureVideoOrientation? {
-        switch self {
-        case .portrait: return .portrait
-        case .portraitUpsideDown: return .portraitUpsideDown
-        case .landscapeLeft: return .landscapeRight
-        case .landscapeRight: return .landscapeLeft
-        default: return nil
-        }
-    }
-}
-
-// MARK: - Interface orientation
-
-extension UIInterfaceOrientation {
-    var videoOrientation: AVCaptureVideoOrientation? {
-        switch self {
-        case .portrait: return .portrait
-        case .portraitUpsideDown: return .portraitUpsideDown
-        case .landscapeLeft: return .landscapeLeft
-        case .landscapeRight: return .landscapeRight
-        default: return nil
-        }
-    }
-}
-
-extension AVCaptureDevice {
-    class func device(with position: AVCaptureDevice.Position) -> AVCaptureDevice? {
-        let devices = AVCaptureDevice.devices(for: .video)
-        for device in devices where device.position == position {
-            return device
-        }
-        return nil
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -49,7 +49,7 @@ override viewDidLoad() {
     // If you use `self` in this block will result in a retain cycle, 
     // it's your duty to break it through `[unowned self]`.
     barcodeHandler = { barcodeObj in
-        print("captured barcode: \(barcodeObj.stringValue!)")
+        loggingPrint("captured barcode: \(barcodeObj.stringValue!)")
     }
 }
 

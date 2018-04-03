@@ -24,7 +24,6 @@ class ViewController: AVScannerViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         prepareBarcodeHandler()
         prepareViewTapHandler()
         
@@ -73,9 +72,9 @@ class ViewController: AVScannerViewController {
     }
 }
 
-extension ViewController {
+fileprivate extension ViewController {
     @available(iOS 9.0, *)
-    fileprivate func openSafariViewController(with url: URL) {
+    func openSafariViewController(with url: URL) {
         let safariView = SFSafariViewController(url: url)
         safariView.modalPresentationStyle = .popover
         present(safariView, animated: true, completion: nil)

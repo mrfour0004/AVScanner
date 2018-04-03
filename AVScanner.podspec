@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AVScanner'
-  s.version          = '0.3.1'
+  s.version          = '0.4.0'
   s.summary          = 'A 1D/2D barcode reader based on AVFoundation.'
 
 # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/mrfour0004/AVScanner.git', :tag => "#{s.version}" }
   # s.social_media_url = 'https://twitter.com/mrfour0004
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '10.0'
 
   s.source_files = 'AVScanner/Classes/**/*'
   

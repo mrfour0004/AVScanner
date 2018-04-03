@@ -5,7 +5,6 @@ target 'AVScanner_Example' do
 
   target 'AVScanner_Tests' do
     inherit! :search_paths
-
     
   end
 end

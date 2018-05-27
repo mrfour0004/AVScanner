@@ -57,10 +57,10 @@ extension AVScannerFocusView {
             self.layer.removeAllAnimations()
             
             self.frame.size = self.breathAnimationOriginSize
-            self.center = CGPoint(x: superview.center.x - self.breathAnimationOriginSize.width / 2 , y: superview.center.y - self.breathAnimationOriginSize.height / 2)
+            self.center = CGPoint(x: superview.center.x - self.breathAnimationOriginSize.width / 2, y: superview.center.y - self.breathAnimationOriginSize.height / 2 - superview.frame.minY)
             
             let targetX = superview.center.x - self.breathAnimationTargetSize.width / 2
-            let targetY = superview.center.y - self.breathAnimationTargetSize.height / 2
+            let targetY = superview.center.y - self.breathAnimationTargetSize.height / 2 - superview.frame.minY
             let targetOrigin = CGPoint(x: targetX, y: targetY)
             
             UIView.animate(withDuration: 0.1, animations: {

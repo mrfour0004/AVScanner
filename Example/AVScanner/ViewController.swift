@@ -17,7 +17,6 @@ class ViewController: AVScannerViewController {
     @IBAction func cameraChange(_ sender: Any) {
         guard isSessionRunning else { return }
         flip()
-        
     }
     
     // MARK: - View controller life cycle
@@ -27,7 +26,7 @@ class ViewController: AVScannerViewController {
         prepareBarcodeHandler()
         prepareViewTapHandler()
         
-        view.bringSubview(toFront: cameraButton)
+        view.bringSubviewToFront(cameraButton)
         supportedMetadataObjectTypes = [.qr, .pdf417]
     }
     
@@ -52,17 +51,8 @@ class ViewController: AVScannerViewController {
     lazy var barcodeDidCaptured: (_ codeObject: AVMetadataMachineReadableCodeObject) -> Void = { [unowned self] codeObject in
         let string = codeObject.stringValue!
         
-        if #available(iOS 9.0, *), let url = URL(string: string), UIApplication.shared.canOpenURL(url) {
-            self.openSafariViewController(with: url)
-        } else {
-            let alertViewController = UIAlertController(title: "Code String", message: string, preferredStyle: .alert)
-            let action = UIAlertAction(title: "OK", style: .default, handler: { _ in
-                alertViewController.dismiss(animated: true)
-                self.startRunningSession()
-            })
-            alertViewController.addAction(action)
-            self.present(alertViewController, animated: true, completion: nil)
-        }
+        guard let url = URL(string: string), UIApplication.shared.canOpenURL(url) else { return }
+        self.openSafariViewController(with: url)
     }
     
     
@@ -73,7 +63,6 @@ class ViewController: AVScannerViewController {
 }
 
 fileprivate extension ViewController {
-    @available(iOS 9.0, *)
     func openSafariViewController(with url: URL) {
         let safariView = SFSafariViewController(url: url)
         safariView.modalPresentationStyle = .popover

@@ -180,7 +180,7 @@ fileprivate extension AVScannerFocusView {
         var i = i0 + ix + iy
         
         let kEpsilon: CGFloat = 0.0001;
-        if(fabs(i) < kEpsilon) { i = kEpsilon * (i > 0 ? 1.0 : -1.0); }
+        if(abs(i) < kEpsilon) { i = kEpsilon * (i > 0 ? 1.0 : -1.0); }
         
         return CATransform3D(m11:a/i, m12:d/i, m13:0, m14:g/i,
                              m21:b/i, m22:e/i, m23:0, m24:h/i,

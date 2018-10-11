@@ -197,7 +197,7 @@ fileprivate extension AVScannerViewController {
         let alertController = UIAlertController(title: self.alertTitle, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: self.alertConfirmTitle, style: .cancel, handler: nil))
         alertController.addAction(UIAlertAction(title: self.alertSettingsTitle, style: .default, handler: { action in
-            UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
         }))
         
         self.present(alertController, animated: true, completion: nil)
@@ -220,14 +220,14 @@ fileprivate extension AVScannerViewController {
         NSLayoutConstraint.activate([
             view.topAnchor.constraint(equalTo: previewView.topAnchor),
             view.leadingAnchor.constraint(equalTo: previewView.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: previewView.trailingAnchor),
-            view.bottomAnchor.constraint(equalTo: previewView.bottomAnchor)
+            view.centerXAnchor.constraint(equalTo: previewView.centerXAnchor),
+            view.centerYAnchor.constraint(equalTo: previewView.centerYAnchor)
         ])
     }
     
     private func prepareFocusView() {
         view.addSubview(focusView)
-        view.bringSubview(toFront: focusView)
+        view.bringSubviewToFront(focusView)
     }
     
     // MARK: - Configure

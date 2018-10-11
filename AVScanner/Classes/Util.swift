@@ -25,6 +25,6 @@ internal func loggingPrint<T>(_ object: @autoclosure () -> T, _ file: String = #
         let fileURL = NSURL(string: file)?.lastPathComponent ?? "Unknown file"
         let queue = Thread.isMainThread ? "UI" : "BG"
         
-        print("<\(queue)> \(fileURL) \(function)[\(line)]: " + String(reflecting: value))
+        print("[AVScanner] <\(queue)> \(fileURL) \(function)[\(line)]: " + String(reflecting: value))
     #endif
 }

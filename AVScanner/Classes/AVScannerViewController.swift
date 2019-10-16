@@ -14,10 +14,10 @@ open class AVScannerViewController: UIViewController {
     
     open var barcodeHandler: ((_ codeObject: AVMetadataMachineReadableCodeObject) -> Void)?
     
-    open var supportedMetadataObjectTypes: [AVMetadataObject.ObjectType] = [.qr] {
+    public var supportedMetadataObjectTypes: [AVMetadataObject.ObjectType] = [.qr] {
         didSet {
             sessionQueue.async {
-                guard self.setupResult == .success else { return }
+                guard self.setupResult == .authorized else { return }
                 self.session.beginConfiguration()
                 self.captureMetaDataOutput.metadataObjectTypes = self.supportedMetadataObjectTypes
                 self.session.commitConfiguration()
@@ -35,7 +35,7 @@ open class AVScannerViewController: UIViewController {
     // MARK: - Session management
     
     private enum SessionSetupResult {
-        case success
+        case authorized
         case notAuthorized
         case configurationFailed
     }
@@ -45,7 +45,7 @@ open class AVScannerViewController: UIViewController {
     private let sessionQueue = DispatchQueue(label: "AVScannerSessionQueue")
     
     private var videoDeviceInput: AVCaptureDeviceInput!
-    private var setupResult: SessionSetupResult = .success
+    private var setupResult: SessionSetupResult = .authorized
     
     public var isSessionRunning = false
     
@@ -103,12 +103,12 @@ open class AVScannerViewController: UIViewController {
 
 extension AVScannerViewController {
     
-    // MARK: Session control
+    // MARK: - Session control
     
     public func startRunningSession() {
         sessionQueue.async {
             switch self.setupResult {
-            case .success:
+            case .authorized:
                 self.session.startRunning()
                 self.isSessionRunning = self.session.isRunning
                 DispatchQueue.main.async {
@@ -130,7 +130,7 @@ extension AVScannerViewController {
     
     public func stopRunningSession() {
         sessionQueue.async {
-            if self.setupResult == .success {
+            if self.setupResult == .authorized {
                 self.session.stopRunning()
                 self.isSessionRunning = self.session.isRunning
             }
@@ -172,9 +172,9 @@ fileprivate extension AVScannerViewController {
         }
         
         session.beginConfiguration()
+        defer { session.commitConfiguration() }
         
         guard let currentCaptureInput = session.inputs.first as? AVCaptureDeviceInput else {
-            session.commitConfiguration()
             return
         }
         
@@ -186,10 +186,7 @@ fileprivate extension AVScannerViewController {
             session.addInput(newCaptureDeviceInput)
         } catch let error as NSError {
             loggingPrint(error.localizedDescription)
-            session.commitConfiguration()
         }
-        
-        session.commitConfiguration()
     }
     
     func requestCameraPermission() {
@@ -256,15 +253,15 @@ fileprivate extension AVScannerViewController {
     }
     
     private func configureSession() {
-        guard setupResult == .success else { return }
+        guard setupResult == .authorized else { return }
         
         loggingPrint("start configure session")
         
         session.beginConfiguration()
+        defer { session.commitConfiguration() }
         
         guard let defaultVideoDevice = AVCaptureDevice.default(position: .back) ?? AVCaptureDevice.default(position: .front) else {
             setupResult = .configurationFailed
-            session.commitConfiguration()
             return
         }
         
@@ -278,31 +275,25 @@ fileprivate extension AVScannerViewController {
                 DispatchQueue.main.async {
                     let statusBarOrientation = UIApplication.shared.statusBarOrientation
                     var initialVideoOrientation: AVCaptureVideoOrientation = .portrait
-                    if statusBarOrientation != .unknown {
-                        if let videoOrientation = statusBarOrientation.videoOrientation {
-                            initialVideoOrientation = videoOrientation
-                        }
+                    if statusBarOrientation != .unknown, let videoOrientation = statusBarOrientation.videoOrientation {
+                        initialVideoOrientation = videoOrientation
                     }
-                    
                     self.previewView.videoPreviewLayer.connection?.videoOrientation = initialVideoOrientation
                 }
             } else {
                 setupResult = .configurationFailed
-                session.commitConfiguration()
+                return
             }
             
         } catch let error {
             loggingPrint(error.localizedDescription)
             setupResult = .configurationFailed
-            session.commitConfiguration()
             return
         }
         
         session.addOutput(captureMetaDataOutput)
         captureMetaDataOutput.setMetadataObjectsDelegate(self, queue: sessionQueue)
         captureMetaDataOutput.metadataObjectTypes = supportedMetadataObjectTypes
-        
-        session.commitConfiguration()
     }
 }
 

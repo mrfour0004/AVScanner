@@ -12,6 +12,12 @@
 		26CA2362463C63CA0C8DF5C427F5A953 /* AVScannerPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37212B74E933B6B4E9BD82FC96F1C7B3 /* AVScannerPreviewView.swift */; };
 		389E601B7FF19AA2BE6F58811AF3481C /* Pods-AVScanner_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 9DDCEAE94D4D82EA24B529266665BEB7 /* Pods-AVScanner_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4AC3AB723F1A03454D9DF2AD1EAF152A /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7DF7F585FA103FA91D53118C5D8A5D /* Util.swift */; };
+		5E94C37E234241C900D868D1 /* AVCaptureSessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E94C37D234241C900D868D1 /* AVCaptureSessionController.swift */; };
+		5E94C38023425CB000D868D1 /* AVScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E94C37F23425CB000D868D1 /* AVScannerView.swift */; };
+		5E94C38323425CEA00D868D1 /* AVScannerViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E94C38223425CEA00D868D1 /* AVScannerViewDelegate.swift */; };
+		5EF9B0462349FD03002D3429 /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF9B0452349FD03002D3429 /* ScannerViewController.swift */; };
+		5EF9B048234A2B94002D3429 /* AVScannerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF9B047234A2B94002D3429 /* AVScannerError.swift */; };
+		5EF9B04B234A2BE1002D3429 /* Result+Void.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF9B04A234A2BE1002D3429 /* Result+Void.swift */; };
 		70F619C97ADA8AA76FB79ED9EF5D6E82 /* AVScanner-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A14D58F62A6CEA48EDEE074E86D46F32 /* AVScanner-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		998A1D87303E5A2A482525A20C765FAD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A16F4CFC63FAC439D7A04994F579A03 /* Foundation.framework */; };
 		9BCFF57E9152FBC8504FAC239FB17F3B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A16F4CFC63FAC439D7A04994F579A03 /* Foundation.framework */; };
@@ -49,12 +55,18 @@
 		1EB0082BA02D6C633B7723D6B8AF29DF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		29C5C156B308DFA4408C7658FDE584DC /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2CE636221D5F3298B3DB01C77BCBEABF /* Pods-AVScanner_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-AVScanner_Example-dummy.m"; sourceTree = "<group>"; };
-		37212B74E933B6B4E9BD82FC96F1C7B3 /* AVScannerPreviewView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AVScannerPreviewView.swift; path = AVScanner/Classes/AVScannerPreviewView.swift; sourceTree = "<group>"; };
+		37212B74E933B6B4E9BD82FC96F1C7B3 /* AVScannerPreviewView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AVScannerPreviewView.swift; sourceTree = "<group>"; };
 		4F9037CF863793110887998001C64665 /* Pods_AVScanner_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVScanner_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		55B8BA5B69D83EB0031A39A225845551 /* AVScannerFocusView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AVScannerFocusView.swift; path = AVScanner/Classes/AVScannerFocusView.swift; sourceTree = "<group>"; };
 		5A16F4CFC63FAC439D7A04994F579A03 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		5E6BEDF499C4E4C02A4E2957F95248AD /* Pods-AVScanner_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-AVScanner_Tests-dummy.m"; sourceTree = "<group>"; };
+		5E94C37D234241C900D868D1 /* AVCaptureSessionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVCaptureSessionController.swift; sourceTree = "<group>"; };
+		5E94C37F23425CB000D868D1 /* AVScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVScannerView.swift; sourceTree = "<group>"; };
+		5E94C38223425CEA00D868D1 /* AVScannerViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVScannerViewDelegate.swift; sourceTree = "<group>"; };
 		5EC2B287034C06701A1ECC625D6C02D9 /* Pods-AVScanner_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-AVScanner_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		5EF9B0452349FD03002D3429 /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
+		5EF9B047234A2B94002D3429 /* AVScannerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVScannerError.swift; sourceTree = "<group>"; };
+		5EF9B04A234A2BE1002D3429 /* Result+Void.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Void.swift"; sourceTree = "<group>"; };
 		6FAC388D3E5B17E0D014043CDC7E3E23 /* AVScanner-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "AVScanner-dummy.m"; sourceTree = "<group>"; };
 		76B4F87D63A1A5B66398FCBEA9D8F8B5 /* AVScanner.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = AVScanner.modulemap; sourceTree = "<group>"; };
 		77EBF977C46704282AF4405375431C6F /* Pods-AVScanner_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-AVScanner_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
@@ -174,6 +186,24 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
+		5E94C38123425CC600D868D1 /* AVScannerView */ = {
+			isa = PBXGroup;
+			children = (
+				37212B74E933B6B4E9BD82FC96F1C7B3 /* AVScannerPreviewView.swift */,
+				5E94C37F23425CB000D868D1 /* AVScannerView.swift */,
+				5E94C38223425CEA00D868D1 /* AVScannerViewDelegate.swift */,
+			);
+			path = AVScannerView;
+			sourceTree = "<group>";
+		};
+		5EF9B049234A2BD7002D3429 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				5EF9B04A234A2BE1002D3429 /* Result+Void.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		7DB346D0F39D3F0E887471402A8071AB = {
 			isa = PBXGroup;
 			children = (
@@ -197,10 +227,14 @@
 		9E470911374F2231D298AD048C12FCCD /* AVScanner */ = {
 			isa = PBXGroup;
 			children = (
+				5EF9B049234A2BD7002D3429 /* Extension */,
+				5E94C38123425CC600D868D1 /* AVScannerView */,
+				5E94C37D234241C900D868D1 /* AVCaptureSessionController.swift */,
 				0337CFC920FD5B3C8429EB0D4BD5E0F7 /* AVFoundation+Extension.swift */,
+				5EF9B047234A2B94002D3429 /* AVScannerError.swift */,
 				55B8BA5B69D83EB0031A39A225845551 /* AVScannerFocusView.swift */,
-				37212B74E933B6B4E9BD82FC96F1C7B3 /* AVScannerPreviewView.swift */,
 				8FDD9E225A99298031C9ABA2878A4AFB /* AVScannerViewController.swift */,
+				5EF9B0452349FD03002D3429 /* ScannerViewController.swift */,
 				8B7DF7F585FA103FA91D53118C5D8A5D /* Util.swift */,
 				5CF4F56B38E087B65C7C874E2237E210 /* Pod */,
 				FEA5944955CAAA9AC93799B8C3C01845 /* Support Files */,
@@ -339,6 +373,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
@@ -390,8 +425,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E94C37E234241C900D868D1 /* AVCaptureSessionController.swift in Sources */,
+				5E94C38323425CEA00D868D1 /* AVScannerViewDelegate.swift in Sources */,
 				CF9C0147B1577A810E15C6C4763A73DA /* AVFoundation+Extension.swift in Sources */,
+				5EF9B0462349FD03002D3429 /* ScannerViewController.swift in Sources */,
+				5EF9B04B234A2BE1002D3429 /* Result+Void.swift in Sources */,
+				5E94C38023425CB000D868D1 /* AVScannerView.swift in Sources */,
 				E4B3E605F1D504B6E2D1404A361BD369 /* AVScanner-dummy.m in Sources */,
+				5EF9B048234A2B94002D3429 /* AVScannerError.swift in Sources */,
 				A57246D05FEAD0DD1C1A3E2721AE7AC5 /* AVScannerFocusView.swift in Sources */,
 				26CA2362463C63CA0C8DF5C427F5A953 /* AVScannerPreviewView.swift in Sources */,
 				BBA378E3C0A38D0CEE80E5B8F6D69878 /* AVScannerViewController.swift in Sources */,
@@ -451,7 +492,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -518,7 +559,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";

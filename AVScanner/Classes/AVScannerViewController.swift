@@ -74,11 +74,6 @@ open class AVScannerViewController: UIViewController {
         stopRunningSession()
     }
     
-    open override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        focusView.layer.anchorPoint = CGPoint.zero
-    }
-    
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         

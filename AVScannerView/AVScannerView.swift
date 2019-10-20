@@ -28,26 +28,28 @@ public class AVScannerView: AVScannerPreviewView {
         }
     }
 
+    // MARK: - Focus view
+
+    private let focusView = AVScannerFocusView()
 
     // MARK: - Initializers
 
     public init(controller: AVCaptureSessionController = .init()) {
         self.sessionController = controller
         super.init(frame: .zero)
+        prepareView()
     }
 
     public required init?(coder: NSCoder) {
         self.sessionController = AVCaptureSessionController()
         super.init(coder: coder)
+        prepareView()
     }
+}
 
-    // MARK: - View Lifecycle
+// MARK: - Session Control
 
-
-
-
-    // MARK: - Session Control
-
+extension AVScannerView {
     public func initSession() {
         session = sessionController.session
         videoPreviewLayer.videoGravity = .resizeAspectFill
@@ -74,6 +76,7 @@ public class AVScannerView: AVScannerPreviewView {
             DispatchQueue.main.async {
                 switch result {
                 case .success:
+                    self.focusView.startAnimation()
                     self.delegate?.scannerViewDidStartSession(self)
                 case .failure(let error):
                     self.delegate?.scannerView(self, didFailStartingSessionWithError: error)
@@ -89,8 +92,20 @@ public class AVScannerView: AVScannerPreviewView {
             }
         }
     }
-
 }
+
+// MARK: - Prepare view
+
+private extension AVScannerView {
+    func prepareView() {
+        prepareFocusView()
+    }
+
+    func prepareFocusView() {
+        addSubview(focusView)
+    }
+}
+
 
 // MARK: - AVCaptureMetadataOutputObjectsDelegate
 
@@ -105,7 +120,9 @@ extension AVScannerView: AVCaptureMetadataOutputObjectsDelegate {
             self.sessionController.stop { [weak self] in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
-                    self.delegate?.scannerView(self, didCapture: transformedMetadataObject)
+                    self.focusView.transform(to: transformedMetadataObject.__corners) {
+                        self.delegate?.scannerView(self, didCapture: transformedMetadataObject)
+                    }
                 }
             }
         }

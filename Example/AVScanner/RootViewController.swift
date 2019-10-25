@@ -10,5 +10,8 @@ import AVScanner
 import AVFoundation
 
 class RootViewController: ScannerViewController {
-    
+
+    @IBAction func flip(_ sender: Any) {
+        scannerView.flip()
+    }
 }

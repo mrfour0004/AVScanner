@@ -35,6 +35,23 @@ public class AVCaptureSessionController: NSObject {
     private var deviceInput: AVCaptureDeviceInput!
     private let captureMetadataOutput: AVCaptureMetadataOutput
 
+    private lazy var videoDeviceDiscoverySession: AVCaptureDevice.DiscoverySession = {
+        var preferredDevices: [AVCaptureDevice.DeviceType] = [.builtInWideAngleCamera]
+        if #available(iOS 11.1, *) {
+            preferredDevices.append(.builtInTrueDepthCamera)
+        }
+        if #available(iOS 10.2, *) {
+            preferredDevices.append(.builtInDualCamera)
+        } else {
+            preferredDevices.append(.builtInDuoCamera)
+        }
+        return AVCaptureDevice.DiscoverySession(
+            deviceTypes: preferredDevices,
+            mediaType: .video,
+            position: .unspecified
+        )
+    }()
+
     // MARK: - Initializers
 
     public init(
@@ -43,6 +60,85 @@ public class AVCaptureSessionController: NSObject {
     ) {
         self.session = session
         self.captureMetadataOutput = captureMetaDataOutput
+    }
+
+    // MARK: - Change Camera
+
+    func flipCamera(_ completion: (() -> Void)? = nil) {
+        guard !session.inputs.isEmpty else { return }
+
+        sessionQueue.async { [session] in
+            let currentDevice = self.deviceInput.device
+            let currentPosition = currentDevice.position
+
+            let preferredPosition = self.preferredPosition(forFlippingCameraFrom: currentPosition)
+            let preferredDeviceType = self.preferredDeviceType(forFlippingCameraFrom: currentPosition)
+
+            let devices = self.videoDeviceDiscoverySession.devices
+            var newVideoDevice: AVCaptureDevice?
+
+            if let device = devices.first(where: { $0.position == preferredPosition && $0.deviceType == preferredDeviceType}) {
+                newVideoDevice = device
+            } else if let device = devices.first(where: { $0.position == preferredPosition }) {
+                newVideoDevice = device
+            }
+
+            guard let videoDevice = newVideoDevice else { return }
+
+            do {
+                let deviceInput = try AVCaptureDeviceInput(device: videoDevice)
+                session.beginConfiguration()
+                defer {
+                    session.commitConfiguration()
+                    completion?()
+                }
+
+                session.removeInput(self.deviceInput)
+
+                if session.canAddInput(deviceInput) {
+                    session.addInput(deviceInput)
+                    self.deviceInput = deviceInput
+                } else {
+                    session.addInput(self.deviceInput)
+                }
+            } catch {
+                print("[AVScanner] Error occurred while creating video device input: \(error)")
+            }
+        }
+    }
+
+    private func preferredPosition(
+        forFlippingCameraFrom currentPosition: AVCaptureDevice.Position
+    ) -> AVCaptureDevice.Position {
+        return currentPosition == .back ? .front : .back
+    }
+
+    private func preferredDeviceType(
+        forFlippingCameraFrom currentPosition: AVCaptureDevice.Position
+    ) -> AVCaptureDevice.DeviceType {
+        switch currentPosition {
+        case .unspecified, .front:
+            if #available(iOS 10.2, *) {
+                return .builtInDualCamera
+            } else {
+                return .builtInDuoCamera
+            }
+        case .back:
+            if #available(iOS 11.1, *) {
+                return .builtInTrueDepthCamera
+            } else if #available(iOS 10.2, *) {
+                return .builtInDualCamera
+            } else {
+                return .builtInDuoCamera
+            }
+        @unknown default:
+            print("Unknown capture position. Defaulting to back, dual-camera.")
+            if #available(iOS 10.2, *) {
+                return .builtInDualCamera
+            } else {
+                return .builtInDuoCamera
+            }
+        }
     }
 
     // MARK: - Sessoion Control

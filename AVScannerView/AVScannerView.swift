@@ -47,6 +47,39 @@ public class AVScannerView: AVScannerPreviewView {
     }
 }
 
+// MARK: - Camera Control
+
+extension AVScannerView {
+    public func flip() {
+        sessionController.stop {}
+        
+        let blurEffectView = UIVisualEffectView()
+        blurEffectView.frame = bounds
+        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(blurEffectView)
+
+        UIView.transition(with: self, duration: 0.4, options: [.transitionFlipFromLeft, .curveEaseInOut], animations: {
+            blurEffectView.effect = UIBlurEffect(style: .light)
+        }, completion: { _ in
+            self.sessionController.flipCamera { [unowned sessionController = self.sessionController] in
+                DispatchQueue.main.async {
+                    UIView.animate(withDuration: 0.2) { self.alpha = 0 }
+                    sessionController.start { _ in
+                        DispatchQueue.main.async {
+                            UIView.animate(withDuration: 0.2, animations: {
+                                self.alpha = 1
+                                blurEffectView.effect = nil
+                            }, completion: { _ in
+                                blurEffectView.removeFromSuperview()
+                            })
+                        }
+                    }
+                }
+            }
+        })
+    }
+}
+
 // MARK: - Session Control
 
 extension AVScannerView {
@@ -115,7 +148,7 @@ extension AVScannerView: AVCaptureMetadataOutputObjectsDelegate {
             guard
                 let barcodeObject = metadataObjects.first,
                 let transformedMetadataObject = self.videoPreviewLayer.transformedMetadataObject(for: barcodeObject) as? AVMetadataMachineReadableCodeObject
-            else { return }
+                else { return }
 
             self.sessionController.stop { [weak self] in
                 guard let self = self else { return }

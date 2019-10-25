@@ -50,13 +50,10 @@ private extension ScannerViewController {
     }
 
     func prepareScannerView() {
-        view.addSubview(scannerView)
-        scannerView.translatesAutoresizingMaskIntoConstraints = false
-        let attributes: [NSLayoutConstraint.Attribute] = [.leading, .top, .centerX, .centerY]
-        let constraints = attributes.map {
-            NSLayoutConstraint(item: scannerView, attribute: $0, relatedBy: .equal, toItem: view, attribute: $0, multiplier: 1, constant: 0)
-        }
-        NSLayoutConstraint.activate(constraints)
+        // Prevent scanner view covering any views set in storyboard or xib.
+        view.insertSubview(scannerView, at: 0)
+        scannerView.frame = view.bounds
+        scannerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         scannerView.delegate = self
     }

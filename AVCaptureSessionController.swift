@@ -197,6 +197,7 @@ public class AVCaptureSessionController: NSObject {
     /// Starts/resumes the session
     func start(_ completion: @escaping (AVSessionStartResult) -> Void) {
         sessionQueue.async { [session] in
+            guard !self.isSessionRunning else { return }
             switch self.setupResult {
             case .success:
                 session.startRunning()
@@ -209,12 +210,12 @@ public class AVCaptureSessionController: NSObject {
     }
 
     /// Stops the session.
-    func stop(_ completion: @escaping () -> Void) {
+    func stop(_ completion: (() -> Void)? = nil) {
         sessionQueue.async {
             guard case .success = self.setupResult else { return }
             self.session.stopRunning()
             self.isSessionRunning = false
-            completion()
+            completion?()
         }
     }
 

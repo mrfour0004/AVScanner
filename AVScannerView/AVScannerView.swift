@@ -12,11 +12,32 @@ public class AVScannerView: AVScannerPreviewView {
 
     // MARK: - Properties
 
-    open var metadataObjectTypes: [AVMetadataObject.ObjectType] {
+    /// A boolean value represents whether the capture session is running.
+    public var isSessionRunning: Bool {
+        return sessionController.isSessionRunning
+    }
+
+    public var videoOrientation: AVCaptureVideoOrientation? {
+        get { videoPreviewLayer.connection?.videoOrientation }
+        set {
+            guard let newValue = newValue else { return }
+            videoPreviewLayer.connection?.videoOrientation = newValue
+            if isSessionRunning {
+                focusView.startAnimation()
+            }
+        }
+    }
+
+    /// An array of strings identifying the types of metadata objects which can be recoganized.
+    ///
+    /// Set this property to any types of metadata you want to support. The default value of this property is
+    /// `[.qr]`.
+    public var supportedMetadataObjectTypes: [AVMetadataObject.ObjectType] {
         get { return sessionController.metadataObjectTypes }
         set { sessionController.metadataObjectTypes = newValue }
     }
-    
+
+    /// The object acts as the delegate of the scanner view.
     open weak var delegate: AVScannerViewDelegate?
 
     private let sessionController: AVCaptureSessionController
@@ -45,13 +66,19 @@ public class AVScannerView: AVScannerPreviewView {
         super.init(coder: coder)
         prepareView()
     }
+
+    // MARK: - View lifecycle
+
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+    }
 }
 
 // MARK: - Camera Control
 
 extension AVScannerView {
     public func flip() {
-        sessionController.stop {}
+        sessionController.stop()
         
         let blurEffectView = UIVisualEffectView()
         blurEffectView.frame = bounds
@@ -83,6 +110,9 @@ extension AVScannerView {
 // MARK: - Session Control
 
 extension AVScannerView {
+    /// Initalizes the capture session.
+    ///
+    /// You need to call this function to initialize the capture session before you calling `startSession()`.
     public func initSession() {
         session = sessionController.session
         videoPreviewLayer.videoGravity = .resizeAspectFill
@@ -92,7 +122,8 @@ extension AVScannerView {
                 switch result {
                 case .success:
                     var initialVideoOrientation: AVCaptureVideoOrientation = .portrait
-                    if self.windowOrientation != .unknown, let videoOrientation = AVCaptureVideoOrientation(interfaceOrientation: self.windowOrientation) {
+                    if self.windowOrientation != .unknown,
+                        let videoOrientation = AVCaptureVideoOrientation(interfaceOrientation: self.windowOrientation) {
                         initialVideoOrientation = videoOrientation
                     }
                     self.videoPreviewLayer.connection?.videoOrientation = initialVideoOrientation
@@ -104,6 +135,9 @@ extension AVScannerView {
         }
     }
 
+    /// Starts running the capture session.
+    ///
+    /// If the session has started, calling this function does nothing.
     public func startSession() {
         sessionController.start { result in
             DispatchQueue.main.async {
@@ -118,12 +152,9 @@ extension AVScannerView {
         }
     }
 
+    /// Stops the capture session if the capture session is running.
     public func stopSession() {
-        sessionController.stop {
-            DispatchQueue.main.async {
-                self.delegate?.scannerViewDidStopSession(self)
-            }
-        }
+        sessionController.stop()
     }
 }
 

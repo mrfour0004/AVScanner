@@ -15,19 +15,17 @@ class ViewController: AVScannerViewController {
     
     @IBOutlet weak var cameraButton: UIButton!
     @IBAction func cameraChange(_ sender: Any) {
-        guard isSessionRunning else { return }
-        flip()
+        scannerView.flip()
     }
     
     // MARK: - View controller life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        prepareBarcodeHandler()
         prepareViewTapHandler()
         
         view.bringSubviewToFront(cameraButton)
-        supportedMetadataObjectTypes = [.qr, .pdf417]
+        scannerView.supportedMetadataObjectTypes = [.qr, .pdf417]
     }
     
     deinit {
@@ -36,16 +34,12 @@ class ViewController: AVScannerViewController {
     
     // MARK: - Prepare viewDidLoad
     
-    private func prepareBarcodeHandler () {
-        barcodeHandler = barcodeDidCaptured
-    }
-    
     private func prepareViewTapHandler() {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapHandler))
         view.addGestureRecognizer(tapGestureRecognizer)
     }
     
-    // MAKR: - AVScanner view handler
+    // MARK: - AVScanner view handler
     
     // Be careful with retain cycle
     lazy var barcodeDidCaptured: (_ codeObject: AVMetadataMachineReadableCodeObject) -> Void = { [unowned self] codeObject in
@@ -57,9 +51,22 @@ class ViewController: AVScannerViewController {
     
     
     @objc func viewTapHandler(_ gesture: UITapGestureRecognizer) {
-        guard !isSessionRunning else { return }
-        startRunningSession()
+        scannerView.startSession()
     }
+
+    // MARK: - Scanner view delegate
+
+    override func scannerView(_ scannerView: AVScannerView, didCapture metadataObject: AVMetadataMachineReadableCodeObject) {
+        let barcodeString = metadataObject.stringValue
+
+        let alertController = UIAlertController(title: nil, message: barcodeString, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            self.scannerView.startSession()
+        }))
+        
+        present(alertController, animated: true, completion: nil)
+    }
+
 }
 
 fileprivate extension ViewController {

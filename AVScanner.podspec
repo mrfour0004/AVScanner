@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AVScanner'
-  s.version          = '0.6.0'
+  s.version          = '1.0.0'
   s.summary          = 'A 1D/2D barcode reader based on AVFoundation.'
 
 # This description is used to generate tags and improve search results.
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '10.0'
 
-  s.source_files = 'AVScanner/Classes/**/*'
+  s.source_files = 'Sources/**/*'
   
   # s.resource_bundles = {
   #   'AVScanner' => ['AVScanner/Assets/*.png']

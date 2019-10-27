@@ -6,10 +6,9 @@
 //  Copyright (c) 2016 mrfour. All rights reserved.
 //
 
-import UIKit
 import AVFoundation
 import AVScanner
-import SafariServices
+import UIKit
 
 class ViewController: AVScannerViewController {
     
@@ -22,36 +21,9 @@ class ViewController: AVScannerViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        prepareViewTapHandler()
         
         view.bringSubviewToFront(cameraButton)
         scannerView.supportedMetadataObjectTypes = [.qr, .pdf417]
-    }
-    
-    deinit {
-        print("deinit")
-    }
-    
-    // MARK: - Prepare viewDidLoad
-    
-    private func prepareViewTapHandler() {
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapHandler))
-        view.addGestureRecognizer(tapGestureRecognizer)
-    }
-    
-    // MARK: - AVScanner view handler
-    
-    // Be careful with retain cycle
-    lazy var barcodeDidCaptured: (_ codeObject: AVMetadataMachineReadableCodeObject) -> Void = { [unowned self] codeObject in
-        let string = codeObject.stringValue!
-        
-        guard let url = URL(string: string), UIApplication.shared.canOpenURL(url) else { return }
-        self.openSafariViewController(with: url)
-    }
-    
-    
-    @objc func viewTapHandler(_ gesture: UITapGestureRecognizer) {
-        scannerView.startSession()
     }
 
     // MARK: - Scanner view delegate
@@ -67,14 +39,15 @@ class ViewController: AVScannerViewController {
         present(alertController, animated: true, completion: nil)
     }
 
-}
-
-fileprivate extension ViewController {
-    func openSafariViewController(with url: URL) {
-        let safariView = SFSafariViewController(url: url)
-        safariView.modalPresentationStyle = .popover
-        present(safariView, animated: true, completion: nil)
+override func scannerView(_ scannerView: AVScannerView, didFailConfigurationWithError error: Error) {
+    guard let saError = error as? AVScannerError else { return }
+    switch saError {
+    case .videoNotAuthorized:
+        print("The user didn't authorize to access the camera")
+    case .configurationFailed:
+        print("This device somehow can't capture videos.")
     }
 }
 
+}
 

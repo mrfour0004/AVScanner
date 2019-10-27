@@ -40,6 +40,10 @@ open class AVScannerViewController: UIViewController, AVScannerViewDelegate {
         scannerView.videoOrientation = newVideoOrientation
     }
 
+    open override var shouldAutorotate: Bool {
+        return scannerView.isSessionRunning
+    }
+
     // MARK: - Scanner view delegate
 
     open func scannerViewDidFinishConfiguration(_ scannerView: AVScannerView) {

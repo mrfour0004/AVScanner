@@ -31,6 +31,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '10.0'
 
   s.source_files = 'Sources/**/*'
+  s.swift_versions = ['5.1']
   
   # s.resource_bundles = {
   #   'AVScanner' => ['AVScanner/Assets/*.png']

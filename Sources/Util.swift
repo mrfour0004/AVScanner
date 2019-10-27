@@ -19,7 +19,7 @@ import Foundation
 ///   - file: The name of the file, defaults to the current file without the ".swift" extension.
 ///   - function: The name of the function, defaults to the function within which the call is made.
 ///   - line: The line number, defaults to the line number within the file that the call is made.
-internal func loggingPrint<T>(_ object: @autoclosure () -> T, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
+func loggingPrint<T>(_ object: @autoclosure () -> T, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
     #if DEBUG
         let value = object()
         let fileURL = NSURL(string: file)?.lastPathComponent ?? "Unknown file"

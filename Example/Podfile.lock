@@ -1,5 +1,5 @@
 PODS:
-  - AVScanner (0.5.0)
+  - AVScanner (1.0.0)
 
 DEPENDENCIES:
   - AVScanner (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  AVScanner: 50b79745c4c322106454e2a6f21ef6263953b58d
+  AVScanner: dee473991e60f4250dc36076ae923480907262af
 
 PODFILE CHECKSUM: 1c93bbc5c6017c5318e0055be86696ebf2bc34d7
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.8.4

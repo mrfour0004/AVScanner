@@ -7,6 +7,8 @@
 
 ## Example
 
+![AVScanner Example](https://raw.githubusercontent.com/mrfour0004/AVScanner/master/Resources/AVScanner-demo.gif)
+
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Reguirement

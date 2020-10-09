@@ -141,7 +141,7 @@ public class AVCaptureSessionController: NSObject {
         }
     }
 
-    // MARK: - Sessoion Control
+    // MARK: - Session Control
 
     public func initSession(
         withMetadataObjectsDelegate metadataObjectsDelegate: AVCaptureMetadataOutputObjectsDelegate,
@@ -170,7 +170,9 @@ public class AVCaptureSessionController: NSObject {
         withMetadataObjectsDelegate metadataObjectsDelegate: AVCaptureMetadataOutputObjectsDelegate,
         completion: @escaping (AVSessionSetupResult) -> Void
     ) {
-        guard case .success = setupResult else { return }
+        guard case .success = setupResult else {
+            return completion(setupResult)
+        }
 
         session.beginConfiguration()
         defer { session.commitConfiguration() }

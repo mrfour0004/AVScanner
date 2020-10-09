@@ -110,7 +110,7 @@ extension AVScannerView {
 // MARK: - Session Control
 
 extension AVScannerView {
-    /// Initalizes the capture session.
+    /// Initializes the capture session.
     ///
     /// You need to call this function to initialize the capture session before you calling `startSession()`.
     public func initSession() {

@@ -30,20 +30,19 @@ open class AVScannerViewController: UIViewController, AVScannerViewDelegate {
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        let orientaton = UIDevice.current.orientation
+        let orientation = UIDevice.current.orientation
 
-        guard
-            let newVideoOrientation = AVCaptureVideoOrientation(deviceOrientation: orientaton),
-            orientaton.isPortrait || orientaton.isLandscape
+        guard let newVideoOrientation = AVCaptureVideoOrientation(deviceOrientation: orientation),
+              orientation.isPortrait || orientation.isLandscape
         else { return }
 
         scannerView.videoOrientation = newVideoOrientation
     }
 
     open override var shouldAutorotate: Bool {
-        return scannerView.isSessionRunning
+        scannerView.isSessionRunning
     }
-
+    
     // MARK: - Scanner view delegate
 
     open func scannerViewDidFinishConfiguration(_ scannerView: AVScannerView) {

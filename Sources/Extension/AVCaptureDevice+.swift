@@ -11,6 +11,6 @@ import AVFoundation
 
 extension AVCaptureDevice {
     static func `default`(position: AVCaptureDevice.Position) -> AVCaptureDevice? {
-        return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
+        AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
     }
 }

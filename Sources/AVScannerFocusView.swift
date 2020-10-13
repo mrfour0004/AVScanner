@@ -138,7 +138,7 @@ fileprivate extension AVScannerFocusView {
     }
     
     func rectToQuad(rect: CGRect, topLeft tl: CGPoint, topRight tr: CGPoint, bottomLeft bl: CGPoint, bottomRight br: CGPoint) -> CATransform3D {
-        return rectToQuad(rect: rect, x1a: tl.x, y1a: tl.y, x2a: tr.x, y2a: tr.y, x3a: bl.x, y3a: bl.y, x4a: br.x, y4a: br.y)
+        rectToQuad(rect: rect, x1a: tl.x, y1a: tl.y, x2a: tr.x, y2a: tr.y, x3a: bl.x, y3a: bl.y, x4a: br.x, y4a: br.y)
     }
     
     func rectToQuad(rect: CGRect, x1a: CGFloat, y1a: CGFloat, x2a: CGFloat, y2a: CGFloat, x3a: CGFloat, y3a: CGFloat, x4a: CGFloat, y4a: CGFloat) -> CATransform3D {

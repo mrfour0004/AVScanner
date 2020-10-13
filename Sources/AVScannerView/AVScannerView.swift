@@ -33,7 +33,7 @@ public class AVScannerView: AVScannerPreviewView {
     /// Set this property to any types of metadata you want to support. The default value of this property is
     /// `[.qr]`.
     public var supportedMetadataObjectTypes: [AVMetadataObject.ObjectType] {
-        get { return sessionController.metadataObjectTypes }
+        get { sessionController.metadataObjectTypes }
         set { sessionController.metadataObjectTypes = newValue }
     }
 

@@ -9,21 +9,21 @@ import AVFoundation
 import UIKit
 
 public class AVScannerPreviewView: UIView {
-    // MARK: - Properteis
+    // MARK: - Properties
     
     public var session: AVCaptureSession? {
-        get { return videoPreviewLayer.session }
+        get { videoPreviewLayer.session }
         set { videoPreviewLayer.session = newValue }
     }
 }
 
 extension AVScannerPreviewView {
     public var videoPreviewLayer: AVCaptureVideoPreviewLayer {
-        return layer as! AVCaptureVideoPreviewLayer
+        layer as! AVCaptureVideoPreviewLayer
     }
     
     public override class var layerClass: AnyClass {
-        return AVCaptureVideoPreviewLayer.self
+        AVCaptureVideoPreviewLayer.self
     }
     
     internal var screenshotImage: UIImage? {

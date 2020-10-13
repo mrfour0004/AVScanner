@@ -110,7 +110,7 @@ public class AVCaptureSessionController: NSObject {
     private func preferredPosition(
         forFlippingCameraFrom currentPosition: AVCaptureDevice.Position
     ) -> AVCaptureDevice.Position {
-        return currentPosition == .back ? .front : .back
+        currentPosition == .back ? .front : .back
     }
 
     private func preferredDeviceType(
